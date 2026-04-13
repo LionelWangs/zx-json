@@ -1632,18 +1632,20 @@
                 const apiUrl = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${encodeURIComponent(githubConfig.path)}`;
 
                 // 2. 先获取当前主文件的 SHA (如果文件已存在)
-                let sha = null;
+                let currentSha = null;
                 let oldContentBase64 = null;
                 try {
-                    const getRes = await fetch(`${apiUrl}?ref=${githubConfig.branch}`, {
+                    // 添加时间戳防止 GitHub API 缓存导致拿到旧的 SHA
+                    const getRes = await fetch(`${apiUrl}?ref=${githubConfig.branch}&t=${new Date().getTime()}`, {
                         headers: {
                             'Authorization': `token ${githubConfig.token}`,
-                            'Accept': 'application/vnd.github.v3+json'
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Cache-Control': 'no-cache'
                         }
                     });
                     if (getRes.ok) {
                         const fileData = await getRes.json();
-                        sha = fileData.sha;
+                        currentSha = fileData.sha;
                         oldContentBase64 = fileData.content;
                     }
                 } catch (e) {
@@ -1651,7 +1653,7 @@
                 }
                 
                 // 3. 只要旧文件存在，就备份一份到 history 目录（降低条件，确保触发）
-                if (sha && oldContentBase64) {
+                if (currentSha && oldContentBase64) {
                     try {
                         const d = new Date();
                         const timeStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}_${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}${String(d.getSeconds()).padStart(2, '0')}`;
@@ -1695,12 +1697,15 @@
                 }
 
                 // 4. 执行 PUT 更新或创建主文件
+                // 如果刚刚执行了备份（并且没有抛出致命异常），主文件的 sha 并没有变
                 const bodyData = {
                     message: `Update budget via Web App - ${new Date().toLocaleString()}`,
                     content: contentBase64,
                     branch: githubConfig.branch
                 };
-                if (sha) bodyData.sha = sha;
+                if (currentSha) {
+                    bodyData.sha = currentSha;
+                }
 
                 const putRes = await fetch(apiUrl, {
                     method: 'PUT',
