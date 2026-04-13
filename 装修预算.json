@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/13 17:21:33",
+  "exportTime": "2026/4/13 17:21:49",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -273,27 +273,14 @@
       "purchaseChannel": "",
       "status": "待购",
       "notes": ""
-    },
-    {
-      "name": "马桶",
-      "brand": "智米",
-      "quantity": 2,
-      "budgetPrice": 4000,
-      "actualPrice": 0,
-      "purchaseChannel": "",
-      "status": "待购",
-      "notes": "",
-      "color": "#ffffff",
-      "locked": false,
-      "id": 1776071904935.6975
     }
   ],
   "statistics": {
-    "totalBudget": 256194,
+    "totalBudget": 252194,
     "totalActual": 145743,
-    "budgetDifference": 110451,
-    "totalQuantity": 49,
+    "budgetDifference": 106451,
+    "totalQuantity": 47,
     "completedCount": 6,
-    "completionRate": 27
+    "completionRate": 29
   }
 }
