@@ -1617,17 +1617,18 @@
                     const getRes = await fetch(`${apiUrl}?ref=${githubConfig.branch}&t=${new Date().getTime()}`, {
                         headers: {
                             'Authorization': `token ${githubConfig.token}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Cache-Control': 'no-cache'
+                            'Accept': 'application/vnd.github.v3+json'
                         }
                     });
                     if (getRes.ok) {
                         const fileData = await getRes.json();
                         currentSha = fileData.sha;
                         oldContentBase64 = fileData.content;
+                    } else {
+                        console.log('获取文件信息响应状态异常:', getRes.status);
                     }
                 } catch (e) {
-                    console.log('获取文件SHA失败，可能主文件是第一次创建');
+                    console.error('获取文件SHA失败，可能主文件是第一次创建或网络异常:', e);
                 }
                 
                 // 3. 只要旧文件存在，就备份一份到 history 目录（降低条件，确保触发）
