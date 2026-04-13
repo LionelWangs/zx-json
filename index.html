@@ -750,7 +750,7 @@
 
             /* 容器适配 */
             .container {
-                padding: 16px 12px;
+                padding: 16px 16px; /* 增加整体缩进 */
             }
 
             /* 统计卡片适配：改为两列 */
@@ -796,25 +796,110 @@
                 white-space: nowrap;
             }
             
-            /* 表格容器允许横向滚动 */
+            /* 表格容器允许横向滚动，但尽量一屏展示 */
             .table-container {
                 overflow-x: auto;
                 border-radius: var(--radius-md);
             }
 
+            table {
+                width: 100%;
+                table-layout: fixed;
+                min-width: 320px; /* 保证表格有一个最小宽度避免挤压过度 */
+            }
+
             /* 表格响应式处理：隐藏不重要的列 */
+            table th:nth-child(1), table td:nth-child(1), /* 拖拽手柄 */
             table th:nth-child(3), table td:nth-child(3), /* 品牌 */
             table th:nth-child(4), table td:nth-child(4), /* 数量 */
             table th:nth-child(7), table td:nth-child(7), /* 购买渠道 */
             table th:nth-child(9), table td:nth-child(9)  /* 备注 */ {
                 display: none;
             }
-            
-            /* 表格文字与内边距缩减 */
+
+            /* 表格文字与内边距极简压缩以适应单屏 */
             table th, table td {
-                padding: 12px 8px;
-                font-size: 13px;
+                padding: 10px 4px;
+                font-size: 12px;
                 white-space: nowrap;
+                text-align: left !important;
+            }
+
+            /* 名称列允许缩略展示 */
+            table th:nth-child(2), table td:nth-child(2) {
+                width: 100px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding-left: 2px !important;
+                padding-right: 2px;
+            }
+
+            /* 预算和实际金额列表头缩短文字 */
+            table th:nth-child(5), table th:nth-child(6) {
+                font-size: 0;
+                padding-left: 2px;
+                padding-right: 2px;
+                width: 50px;
+            }
+            table th:nth-child(5)::before { content: "预算"; font-size: 11px; }
+            table th:nth-child(6)::before { content: "实际"; font-size: 11px; }
+            table th:nth-child(5) i, table th:nth-child(6) i { font-size: 14px; margin-left: 0px; }
+            
+            /* 数据行缩小金额字体 */
+            table td:nth-child(5), table td:nth-child(6) {
+                font-size: 11px;
+                padding-left: 2px;
+                padding-right: 2px;
+                width: 50px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* 调整状态表头文字对齐和宽度 */
+            table th:nth-child(8) {
+                text-align: left !important;
+                width: 48px;
+                padding-left: 2px;
+                padding-right: 2px;
+                font-size: 12px; /* 恢复表头文字大小 */
+            }
+            table td:nth-child(8) {
+                text-align: left !important;
+                width: 48px;
+                padding-left: 2px;
+                padding-right: 2px;
+            }
+            table th:nth-child(8) i {
+                font-size: 14px;
+                margin-left: 2px;
+            }
+            /* 状态徽章在移动端只显示颜色圆点 */
+            .status-badge {
+                width: 10px;
+                height: 10px;
+                padding: 0;
+                font-size: 0;
+                border-radius: 50%;
+                display: inline-block;
+                vertical-align: middle;
+            }
+            .status-done { background: var(--accent-green); box-shadow: 0 0 8px rgba(50, 215, 75, 0.4); }
+            .status-paid { background: var(--accent-orange); box-shadow: 0 0 8px rgba(255, 159, 10, 0.4); }
+            .status-pending { background: var(--accent-blue); box-shadow: 0 0 8px rgba(10, 132, 255, 0.4); }
+
+            /* 操作按钮缩减间距和宽度 */
+            table th:last-child, table td:last-child {
+                text-align: left !important;
+                padding-right: 0px;
+                padding-left: 0px;
+                width: 48px;
+            }
+            table td:last-child .btn {
+                padding: 2px;
+                gap: 0;
+            }
+            table td:last-child .btn i {
+                font-size: 16px; /* 调大操作图标字体以便点击 */
             }
 
             /* 弹窗适配 */
@@ -945,7 +1030,7 @@
                         <th>购买渠道</th>
                         <th class="sortable" onclick="handleSort('status')">状态 <i class="ph ph-caret-down"></i></th>
                         <th>备注</th>
-                        <th width="100" style="text-align: right;">操作</th>
+                        <th width="80" style="text-align: left;">操作</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -1296,19 +1381,19 @@
 
                     tr.innerHTML = `
                         <td>${dragHtml}</td>
-                        <td style="font-weight: 600; color: var(--text-primary);">${item.name || '-'}</td>
+                        <td style="font-weight: 600; color: var(--text-primary);" title="${item.name || '-'}">${item.name || '-'}</td>
                         <td style="color: var(--text-secondary);">${item.brand || '-'}</td>
                         <td style="color: var(--text-secondary);">${item.quantity || 1}</td>
-                        <td>¥${bPrice.toLocaleString()}</td>
-                        <td style="font-weight: 600;">¥${aPrice.toLocaleString()} ${isOverBudget ? '<i class="ph-fill ph-warning-circle" style="color: var(--accent-red); margin-left: 4px;"></i>' : ''}</td>
+                        <td title="¥${bPrice.toLocaleString()}">¥${bPrice.toLocaleString()}</td>
+                        <td style="font-weight: 600;" title="¥${aPrice.toLocaleString()}">¥${aPrice.toLocaleString()} ${isOverBudget ? '<i class="ph-fill ph-warning-circle" style="color: var(--accent-red); margin-left: 4px;"></i>' : ''}</td>
                         <td style="color: var(--text-secondary);">${item.purchaseChannel || '-'}</td>
-                        <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+                        <td><span class="status-badge ${statusClass}" title="${item.status}">${item.status}</span></td>
                         <td style="color: var(--text-secondary); font-size: 13px; max-width: 200px;">
                             <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.notes || ''}">
                                 ${item.notes || '-'}
                             </div>
                         </td>
-                        <td style="text-align: right; white-space: nowrap;">
+                        <td style="text-align: left; white-space: nowrap;">
                             <button class="btn btn-ghost" onclick="editData(${item.id})"><i class="ph ph-pencil-simple"></i></button>
                             <button class="btn btn-ghost btn-danger" onclick="deleteData(${item.id})"><i class="ph ph-trash"></i></button>
                         </td>
