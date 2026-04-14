@@ -810,10 +810,10 @@
 
             /* 表格响应式处理：隐藏不重要的列 */
             table th:nth-child(1), table td:nth-child(1), /* 拖拽手柄 */
-            table th:nth-child(3), table td:nth-child(3), /* 品牌 */
-            table th:nth-child(4), table td:nth-child(4), /* 数量 */
-            table th:nth-child(7), table td:nth-child(7), /* 购买渠道 */
-            table th:nth-child(9), table td:nth-child(9)  /* 备注 */ {
+            table th:nth-child(4), table td:nth-child(4), /* 品牌 */
+            table th:nth-child(5), table td:nth-child(5), /* 数量 */
+            table th:nth-child(8), table td:nth-child(8), /* 购买渠道 */
+            table th:nth-child(10), table td:nth-child(10)  /* 备注 */ {
                 display: none;
             }
 
@@ -834,19 +834,27 @@
                 padding-right: 2px;
             }
 
+            /* 分类列在移动端缩小 */
+            table th:nth-child(3), table td:nth-child(3) {
+                width: 40px;
+                font-size: 11px;
+                padding-left: 2px;
+                padding-right: 2px;
+            }
+
             /* 预算和实际金额列表头缩短文字 */
-            table th:nth-child(5), table th:nth-child(6) {
+            table th:nth-child(6), table th:nth-child(7) {
                 font-size: 0;
                 padding-left: 2px;
                 padding-right: 2px;
                 width: 50px;
             }
-            table th:nth-child(5)::before { content: "预算"; font-size: 11px; }
-            table th:nth-child(6)::before { content: "实际"; font-size: 11px; }
-            table th:nth-child(5) i, table th:nth-child(6) i { font-size: 14px; margin-left: 0px; }
+            table th:nth-child(6)::before { content: "预算"; font-size: 11px; }
+            table th:nth-child(7)::before { content: "实际"; font-size: 11px; }
+            table th:nth-child(6) i, table th:nth-child(7) i { font-size: 14px; margin-left: 0px; }
             
             /* 数据行缩小金额字体 */
-            table td:nth-child(5), table td:nth-child(6) {
+            table td:nth-child(6), table td:nth-child(7) {
                 font-size: 11px;
                 padding-left: 2px;
                 padding-right: 2px;
@@ -856,20 +864,20 @@
             }
 
             /* 调整状态表头文字对齐和宽度 */
-            table th:nth-child(8) {
+            table th:nth-child(9) {
                 text-align: left !important;
                 width: 48px;
                 padding-left: 2px;
                 padding-right: 2px;
                 font-size: 12px; /* 恢复表头文字大小 */
             }
-            table td:nth-child(8) {
+            table td:nth-child(9) {
                 text-align: left !important;
                 width: 48px;
                 padding-left: 2px;
                 padding-right: 2px;
             }
-            table th:nth-child(8) i {
+            table th:nth-child(9) i {
                 font-size: 14px;
                 margin-left: 2px;
             }
@@ -950,6 +958,9 @@
             <button class="btn btn-outline" onclick="exportJSON()">
                 <i class="ph ph-download-simple"></i> 导出 JSON
             </button>
+            <button class="btn btn-outline" onclick="openJsonModal()">
+                <i class="ph ph-code"></i> JSON 数据
+            </button>
             <button class="btn btn-outline" onclick="exportExcel()">
                 <i class="ph ph-file-xls"></i> 导出 Excel
             </button>
@@ -966,8 +977,14 @@
                 <i class="ph ph-magnifying-glass"></i>
                 <input type="text" class="search-input" id="searchInput" placeholder="搜索名称、品牌或备注..." oninput="handleFilter()">
             </div>
+            <div class="filter-group" id="categoryFilter" style="margin-right: auto; margin-left: 12px;">
+                <button class="filter-btn active" data-category="all" onclick="setCategoryFilter('all')">全部分类</button>
+                <button class="filter-btn" data-category="硬装" onclick="setCategoryFilter('硬装')">硬装</button>
+                <button class="filter-btn" data-category="家电" onclick="setCategoryFilter('家电')">家电</button>
+                <button class="filter-btn" data-category="必要支出" onclick="setCategoryFilter('必要支出')">必要支出</button>
+            </div>
             <div class="filter-group" id="statusFilter">
-                <button class="filter-btn active" data-status="all" onclick="setFilter('all')">全部</button>
+                <button class="filter-btn active" data-status="all" onclick="setFilter('all')">全部状态</button>
                 <button class="filter-btn" data-status="待购" onclick="setFilter('待购')">待购</button>
                 <button class="filter-btn" data-status="已付款" onclick="setFilter('已付款')">已付款</button>
                 <button class="filter-btn" data-status="已完成" onclick="setFilter('已完成')">已完成</button>
@@ -1023,6 +1040,7 @@
                     <tr>
                         <th width="40"></th>
                         <th class="sortable" onclick="handleSort('name')">名称 <i class="ph ph-caret-down"></i></th>
+                        <th class="sortable" onclick="handleSort('category')">分类 <i class="ph ph-caret-down"></i></th>
                         <th class="sortable" onclick="handleSort('brand')">品牌 <i class="ph ph-caret-down"></i></th>
                         <th>数量</th>
                         <th class="sortable" onclick="handleSort('budgetPrice')">预算金额 <i class="ph ph-caret-down"></i></th>
@@ -1057,6 +1075,15 @@
                 <div class="form-group full">
                     <label>名称</label>
                     <input type="text" class="form-control" id="form-name" required placeholder="如：中央空调">
+                </div>
+                
+                <div class="form-group">
+                    <label>分类</label>
+                    <select class="form-control" id="form-category">
+                        <option value="硬装">硬装</option>
+                        <option value="家电">家电</option>
+                        <option value="必要支出">必要支出</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
@@ -1141,6 +1168,27 @@
         </div>
     </div>
 
+    <!-- 弹窗：JSON 数据 -->
+    <div class="modal-overlay" id="jsonModalOverlay">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2><i class="ph ph-code"></i> JSON 数据</h2>
+                <button class="btn btn-ghost" onclick="closeJsonModal()"><i class="ph ph-x" style="font-size: 20px;"></i></button>
+            </div>
+            <div class="modal-body" style="grid-template-columns: 1fr;">
+                <div class="form-group full">
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">你可以查看、复制当前的 JSON 数据，或者在此处粘贴新的 JSON 数据并保存以覆盖当前页面数据。</p>
+                    <textarea class="form-control" id="json-textarea" rows="20" style="font-family: monospace; font-size: 13px; resize: vertical;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="copyJsonData()">复制到剪贴板</button>
+                <button class="btn btn-outline" onclick="closeJsonModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveJsonData()">保存并覆盖</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- 1. 初始化数据与缓存机制 ---
         const CACHE_KEY = 'renovation_data_v1';
@@ -1149,6 +1197,7 @@
         let appliances = [];
         let filteredData = []; // 用于搜索筛选和排序后的数据
         let currentFilter = 'all'; // all, 待购, 已付款, 已完成
+        let currentCategoryFilter = 'all'; // all, 硬装, 家电, 必要支出
         let currentSearch = '';
         let sortConfig = { key: null, isDesc: false }; // 排序状态
         
@@ -1237,8 +1286,16 @@
         function setFilter(status) {
             currentFilter = status;
             // 更新按钮UI
-            document.querySelectorAll('.filter-btn').forEach(btn => {
+            document.querySelectorAll('#statusFilter .filter-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.status === status);
+            });
+            applyFiltersAndSort();
+        }
+
+        function setCategoryFilter(category) {
+            currentCategoryFilter = category;
+            document.querySelectorAll('#categoryFilter .filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.category === category);
             });
             applyFiltersAndSort();
         }
@@ -1279,9 +1336,10 @@
             // 1. 过滤
             filteredData = appliances.filter(item => {
                 const matchStatus = currentFilter === 'all' || item.status === currentFilter;
-                const searchTarget = `${item.name} ${item.brand} ${item.notes}`.toLowerCase();
+                const matchCategory = currentCategoryFilter === 'all' || item.category === currentCategoryFilter;
+                const searchTarget = `${item.name} ${item.category} ${item.brand} ${item.notes}`.toLowerCase();
                 const matchSearch = currentSearch === '' || searchTarget.includes(currentSearch);
-                return matchStatus && matchSearch;
+                return matchStatus && matchCategory && matchSearch;
             });
 
             // 2. 排序
@@ -1382,6 +1440,7 @@
                     tr.innerHTML = `
                         <td>${dragHtml}</td>
                         <td style="font-weight: 600; color: var(--text-primary);" title="${item.name || '-'}">${item.name || '-'}</td>
+                        <td style="color: var(--text-secondary);">${item.category || '-'}</td>
                         <td style="color: var(--text-secondary);">${item.brand || '-'}</td>
                         <td style="color: var(--text-secondary);">${item.quantity || 1}</td>
                         <td title="¥${bPrice.toLocaleString()}">¥${bPrice.toLocaleString()}</td>
@@ -1638,6 +1697,43 @@
             window.requestAnimationFrame(step);
         }
 
+        // --- JSON 数据查看与覆盖 ---
+        function openJsonModal() {
+            const jsonStr = JSON.stringify(appliances, null, 4);
+            document.getElementById('json-textarea').value = jsonStr;
+            document.getElementById('jsonModalOverlay').classList.add('active');
+        }
+
+        function closeJsonModal() {
+            document.getElementById('jsonModalOverlay').classList.remove('active');
+        }
+
+        function copyJsonData() {
+            const textarea = document.getElementById('json-textarea');
+            textarea.select();
+            document.execCommand('copy');
+            alert('已复制到剪贴板！');
+        }
+
+        function saveJsonData() {
+            const jsonStr = document.getElementById('json-textarea').value;
+            try {
+                const parsedData = JSON.parse(jsonStr);
+                if (Array.isArray(parsedData)) {
+                    if (confirm('确定要使用粘贴的 JSON 数据覆盖当前所有数据吗？此操作不可撤销。')) {
+                        appliances = parsedData;
+                        applyFiltersAndSort();
+                        closeJsonModal();
+                        alert('数据已成功覆盖！');
+                    }
+                } else {
+                    alert('无效的 JSON 格式：必须是一个数组。');
+                }
+            } catch (e) {
+                alert('JSON 解析失败，请检查格式是否正确：\n' + e.message);
+            }
+        }
+
         // --- 3. CRUD 操作 ---
         const modal = document.getElementById('modalOverlay');
 
@@ -1647,6 +1743,7 @@
                 const item = appliances.find(a => a.id === id);
                 document.getElementById('form-id').value = item.id;
                 document.getElementById('form-name').value = item.name;
+                document.getElementById('form-category').value = item.category || '硬装';
                 document.getElementById('form-brand').value = item.brand;
                 document.getElementById('form-quantity').value = item.quantity;
                 document.getElementById('form-budget').value = item.budgetPrice;
@@ -1658,6 +1755,7 @@
                 // 清空表单
                 document.querySelectorAll('.form-control').forEach(el => el.value = '');
                 document.getElementById('form-id').value = '';
+                document.getElementById('form-category').value = '硬装';
                 document.getElementById('form-quantity').value = 1;
                 document.getElementById('form-budget').value = 0;
                 document.getElementById('form-actual').value = 0;
@@ -1677,6 +1775,7 @@
 
             const itemData = {
                 name: name,
+                category: document.getElementById('form-category').value,
                 brand: document.getElementById('form-brand').value,
                 quantity: Number(document.getElementById('form-quantity').value) || 1,
                 budgetPrice: Number(document.getElementById('form-budget').value) || 0,
@@ -2065,12 +2164,13 @@
             }
 
             // 构造二维数组 (AOA)
-            const headers = ["名称", "品牌", "数量", "预算金额(¥)", "实际金额(¥)", "购买渠道", "状态", "备注"];
+            const headers = ["名称", "分类", "品牌", "数量", "预算金额(¥)", "实际金额(¥)", "购买渠道", "状态", "备注"];
             const aoa = [headers];
 
             dataToExport.forEach(item => {
                 aoa.push([
                     item.name || '',
+                    item.category || '',
                     item.brand || '',
                     item.quantity || 1,
                     item.budgetPrice || 0,
@@ -2137,20 +2237,20 @@
                         const isOverBudget = bPrice > 0 && aPrice > bPrice;
 
                         // 针对特定列的样式微调
-                        if (C === 3 || C === 4) {
+                        if (C === 4 || C === 5) {
                             // 金额列数字格式
                             ws[cellRef].t = 'n'; 
-                            cellStyle.font.bold = (C === 4); // 实际金额加粗
+                            cellStyle.font.bold = (C === 5); // 实际金额加粗
                             cellStyle.alignment.horizontal = "right"; // 金额右对齐
                             
                             // 实际金额超预算变红
-                            if (C === 4 && isOverBudget) {
+                            if (C === 5 && isOverBudget) {
                                 cellStyle.font.color = { rgb: "FF3B30" };
                             }
                         }
 
                         // 状态列特殊颜色
-                        if (C === 6) {
+                        if (C === 7) {
                             const status = ws[cellRef].v;
                             cellStyle.alignment.horizontal = "center";
                             cellStyle.font.bold = true;
@@ -2167,19 +2267,19 @@
                         }
 
                         // 整行超预算时，名称列加个微红底色（可选）
-                        if (isOverBudget && C !== 6) {
+                        if (isOverBudget && C !== 7) {
                             cellStyle.fill = { fgColor: { rgb: "FFF2F2" } };
                         }
 
                         // 备注列、品牌列次要文本
-                        if (C === 1 || C === 5 || C === 7) {
+                        if (C === 2 || C === 6 || C === 8) {
                             if (!isOverBudget) { // 如果不是超预算行，设置灰色
                                 cellStyle.font.color = { rgb: "86868B" };
                             }
                         }
 
                         // 备注列允许换行
-                        if (C === 7) {
+                        if (C === 8) {
                             cellStyle.alignment.wrapText = true;
                         }
 
@@ -2191,6 +2291,7 @@
             // 设置列宽
             ws['!cols'] = [
                 { wpx: 140 }, // 名称
+                { wpx: 80 },  // 分类
                 { wpx: 120 }, // 品牌
                 { wpx: 60 },  // 数量
                 { wpx: 110 }, // 预算
