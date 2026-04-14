@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/13 17:22:15",
+  "exportTime": "2026/4/14 08:43:58",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -12,7 +12,8 @@
       "actualPrice": 12600,
       "purchaseChannel": "线下实体店",
       "status": "已完成",
-      "notes": ""
+      "notes": "",
+      "category": "必要支出"
     },
     {
       "id": 1763208803454.422,
@@ -25,7 +26,8 @@
       "actualPrice": 27300,
       "purchaseChannel": "线下实体店",
       "status": "已完成",
-      "notes": ""
+      "notes": "",
+      "category": "家电"
     },
     {
       "id": 1766975566098.8591,
@@ -38,7 +40,8 @@
       "actualPrice": 4194,
       "purchaseChannel": "线下实体店",
       "status": "已完成",
-      "notes": ""
+      "notes": "",
+      "category": "必要支出"
     },
     {
       "id": 1766975566102.8591,
@@ -51,7 +54,8 @@
       "actualPrice": 10000,
       "purchaseChannel": "线下实体店",
       "status": "已完成",
-      "notes": ""
+      "notes": "",
+      "category": "硬装"
     },
     {
       "id": 1772780942877.0815,
@@ -64,7 +68,8 @@
       "actualPrice": 460,
       "purchaseChannel": "京东",
       "status": "已完成",
-      "notes": ""
+      "notes": "",
+      "category": "硬装"
     },
     {
       "id": 1766975566103.8591,
@@ -77,7 +82,8 @@
       "actualPrice": 3000,
       "purchaseChannel": "线下实体店",
       "status": "已完成",
-      "notes": ""
+      "notes": "",
+      "category": "硬装"
     },
     {
       "id": 1760340848585.455,
@@ -90,7 +96,8 @@
       "actualPrice": 69000,
       "purchaseChannel": "线下实体店",
       "status": "已付款",
-      "notes": "已经付了 定金2000+设计费 8000+一期 18650+二期 20650+三期 15930"
+      "notes": "已经付了 定金2000+设计费 8000+一期 18650+二期 20650+三期 15930",
+      "category": "硬装"
     },
     {
       "id": 1766975566108.8591,
@@ -103,7 +110,8 @@
       "actualPrice": 3800,
       "purchaseChannel": "线下实体店",
       "status": "已付款",
-      "notes": "无主灯"
+      "notes": "无主灯",
+      "category": "家电"
     },
     {
       "id": 1766975566107.8591,
@@ -116,7 +124,8 @@
       "actualPrice": 11600,
       "purchaseChannel": "线下实体店",
       "status": "已付款",
-      "notes": ""
+      "notes": "",
+      "category": "硬装"
     },
     {
       "id": 1775993307164.5715,
@@ -129,7 +138,8 @@
       "actualPrice": 2200,
       "purchaseChannel": "线下实体店",
       "status": "已付款",
-      "notes": ""
+      "notes": "",
+      "category": "硬装"
     },
     {
       "id": 1776051166293.0078,
@@ -142,59 +152,36 @@
       "actualPrice": 1589,
       "purchaseChannel": "京东",
       "status": "已付款",
-      "notes": ""
-    },
-    {
-      "id": 1766975566104.8591,
-      "color": "#ffffff",
-      "locked": false,
-      "name": "卫浴",
-      "brand": "",
-      "quantity": 1,
-      "budgetPrice": 7500,
-      "actualPrice": 0,
-      "purchaseChannel": "",
-      "status": "待购",
-      "notes": ""
-    },
-    {
-      "id": 1766975566105.8591,
-      "color": "#ffffff",
-      "locked": false,
-      "name": "台盆",
-      "brand": "",
-      "quantity": 1,
-      "budgetPrice": 6000,
-      "actualPrice": 0,
-      "purchaseChannel": "",
-      "status": "待购",
-      "notes": ""
+      "notes": "",
+      "category": "家电"
     },
     {
       "id": 1766975566106.8591,
       "color": "#ffffff",
       "locked": false,
       "name": "定制柜",
-      "brand": "",
+      "brand": "工厂",
       "quantity": 1,
       "budgetPrice": 50000,
       "actualPrice": 0,
       "purchaseChannel": "",
       "status": "待购",
-      "notes": ""
+      "notes": "",
+      "category": "硬装"
     },
     {
       "id": 1769858861468.739,
       "color": "#ffffff",
       "locked": false,
       "name": "厨房三联动",
-      "brand": "",
+      "brand": "工厂",
       "quantity": 1,
       "budgetPrice": 3000,
       "actualPrice": 0,
       "purchaseChannel": "",
       "status": "待购",
-      "notes": ""
+      "notes": "",
+      "category": "硬装"
     },
     {
       "id": 1769858882057.6218,
@@ -207,93 +194,170 @@
       "actualPrice": 0,
       "purchaseChannel": "",
       "status": "待购",
-      "notes": ""
+      "notes": "",
+      "category": "硬装"
     },
     {
-      "id": 1766975566114.8591,
+      "id": 1777000100001,
       "color": "#ffffff",
       "locked": false,
-      "name": "净水三件套",
-      "brand": "",
+      "name": "米家餐厅吊灯",
+      "brand": "米家",
       "quantity": 1,
-      "budgetPrice": 4000,
-      "actualPrice": 0,
-      "purchaseChannel": "",
-      "status": "待购",
-      "notes": ""
-    },
-    {
-      "id": 1766975566111.8591,
-      "color": "#ffffff",
-      "locked": false,
-      "name": "烟灶套装",
-      "brand": "",
-      "quantity": 1,
-      "budgetPrice": 4000,
-      "actualPrice": 0,
-      "purchaseChannel": "",
-      "status": "待购",
-      "notes": ""
-    },
-    {
-      "id": 1766975566113.8591,
-      "color": "#ffffff",
-      "locked": false,
-      "name": "洗碗机",
-      "brand": "",
-      "quantity": 1,
-      "budgetPrice": 10000,
-      "actualPrice": 0,
-      "purchaseChannel": "",
-      "status": "待购",
-      "notes": ""
-    },
-    {
-      "id": 1766975566109.8591,
-      "color": "#ffffff",
-      "locked": false,
-      "name": "冰箱",
-      "brand": "",
-      "quantity": 1,
-      "budgetPrice": 6000,
-      "actualPrice": 0,
-      "purchaseChannel": "",
-      "status": "待购",
-      "notes": ""
-    },
-    {
-      "id": 1766975566110.8591,
-      "color": "#ffffff",
-      "locked": false,
-      "name": "电视",
-      "brand": "",
-      "quantity": 1,
-      "budgetPrice": 7000,
-      "actualPrice": 0,
-      "purchaseChannel": "",
-      "status": "待购",
-      "notes": ""
-    },
-    {
-      "name": "马桶",
-      "brand": "智米",
-      "quantity": 2,
-      "budgetPrice": 4000,
-      "actualPrice": 0,
-      "purchaseChannel": "",
+      "budgetPrice": 799,
+      "actualPrice": 799,
+      "purchaseChannel": "京东",
       "status": "待购",
       "notes": "",
+      "category": "家电"
+    },
+    {
+      "id": 1777000100002,
       "color": "#ffffff",
       "locked": false,
-      "id": 1776072133146.4497
+      "name": "米家净水器Pro双出水1600G+前置过滤套装",
+      "brand": "米家",
+      "quantity": 1,
+      "budgetPrice": 5397,
+      "actualPrice": 3947,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "活动价，原价5397",
+      "category": "家电"
+    },
+    {
+      "id": 1777000100003,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "米家智能晾衣机2Pro",
+      "brand": "米家",
+      "quantity": 1,
+      "budgetPrice": 1799,
+      "actualPrice": 1699,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "",
+      "category": "家电"
+    },
+    {
+      "id": 1777000100004,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "米家智能浴霸P1",
+      "brand": "米家",
+      "quantity": 1,
+      "budgetPrice": 1399,
+      "actualPrice": 1299,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "",
+      "category": "家电"
+    },
+    {
+      "id": 1777000100005,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "米家智能浴霸N1+米家控温淋浴花洒套装",
+      "brand": "米家",
+      "quantity": 1,
+      "budgetPrice": 2198,
+      "actualPrice": 2198,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "套装标价，N1单买约699+花洒约1499",
+      "category": "家电"
+    },
+    {
+      "id": 1777000100006,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "米家智能净烟机P2+定时灶5200W烟灶套装",
+      "brand": "米家",
+      "quantity": 1,
+      "budgetPrice": 6198,
+      "actualPrice": 3999,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "活动价，原价6198",
+      "category": "家电"
+    },
+    {
+      "id": 1777000100007,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "米家恒温淋浴花洒S1",
+      "brand": "米家",
+      "quantity": 1,
+      "budgetPrice": 1645,
+      "actualPrice": 1399,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "",
+      "category": "家电"
+    },
+    {
+      "id": 1777000100008,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "米家洗烘套装Pro(超电解智投热泵烘干)",
+      "brand": "米家",
+      "quantity": 1,
+      "budgetPrice": 10298,
+      "actualPrice": 8234,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "活动价，原价10298",
+      "category": "家电"
+    },
+    {
+      "id": 1777000100009,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "REDMI电视X85 2026",
+      "brand": "REDMI",
+      "quantity": 1,
+      "budgetPrice": 6899,
+      "actualPrice": 5299,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "",
+      "category": "家电"
+    },
+    {
+      "id": 1777000100010,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "米家智能嵌入式洗碗机16套P2",
+      "brand": "米家",
+      "quantity": 1,
+      "budgetPrice": 6499,
+      "actualPrice": 4699,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "",
+      "category": "家电"
+    },
+    {
+      "id": 1777000100011,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "米家冰箱Pro微冰鲜双系统十字平嵌",
+      "brand": "米家",
+      "quantity": 1,
+      "budgetPrice": 9999,
+      "actualPrice": 5299,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "活动价，原价9999",
+      "category": "家电"
     }
   ],
   "statistics": {
-    "totalBudget": 256194,
-    "totalActual": 145743,
-    "budgetDifference": 110451,
-    "totalQuantity": 49,
+    "totalBudget": 260824,
+    "totalActual": 184614,
+    "budgetDifference": 76210,
+    "totalQuantity": 51,
     "completedCount": 6,
-    "completionRate": 27
+    "completionRate": 24
   }
 }
