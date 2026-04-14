@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/14 09:22:13",
+  "exportTime": "2026/4/14 09:28:31",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -11,7 +11,7 @@
       "budgetPrice": 12600,
       "actualPrice": 12600,
       "purchaseChannel": "线下实体店",
-      "status": "已完成",
+      "status": "完成",
       "notes": "",
       "category": "必要支出"
     },
@@ -25,7 +25,7 @@
       "budgetPrice": 27300,
       "actualPrice": 27300,
       "purchaseChannel": "线下实体店",
-      "status": "已完成",
+      "status": "完成",
       "notes": "",
       "category": "家电"
     },
@@ -39,7 +39,7 @@
       "budgetPrice": 4194,
       "actualPrice": 4194,
       "purchaseChannel": "线下实体店",
-      "status": "已完成",
+      "status": "完成",
       "notes": "",
       "category": "必要支出"
     },
@@ -53,7 +53,7 @@
       "budgetPrice": 14000,
       "actualPrice": 10000,
       "purchaseChannel": "线下实体店",
-      "status": "已完成",
+      "status": "完成",
       "notes": "",
       "category": "硬装"
     },
@@ -67,7 +67,7 @@
       "budgetPrice": 400,
       "actualPrice": 460,
       "purchaseChannel": "京东",
-      "status": "已完成",
+      "status": "完成",
       "notes": "",
       "category": "硬装"
     },
@@ -81,7 +81,7 @@
       "budgetPrice": 3000,
       "actualPrice": 3000,
       "purchaseChannel": "线下实体店",
-      "status": "已完成",
+      "status": "完成",
       "notes": "",
       "category": "硬装"
     },
@@ -95,7 +95,7 @@
       "budgetPrice": 69000,
       "actualPrice": 69000,
       "purchaseChannel": "线下实体店",
-      "status": "已付款",
+      "status": "付款",
       "notes": "已经付了 定金2000+设计费 8000+一期 18650+二期 20650+三期 15930",
       "category": "硬装"
     },
@@ -109,7 +109,7 @@
       "budgetPrice": 8000,
       "actualPrice": 3800,
       "purchaseChannel": "线下实体店",
-      "status": "已付款",
+      "status": "付款",
       "notes": "无主灯",
       "category": "家电"
     },
@@ -123,7 +123,7 @@
       "budgetPrice": 12000,
       "actualPrice": 11600,
       "purchaseChannel": "线下实体店",
-      "status": "已付款",
+      "status": "付款",
       "notes": "",
       "category": "硬装"
     },
@@ -134,10 +134,10 @@
       "name": "窗台石",
       "brand": "工厂",
       "quantity": 1,
-      "budgetPrice": 0,
+      "budgetPrice": 1,
       "actualPrice": 2200,
       "purchaseChannel": "线下实体店",
-      "status": "已付款",
+      "status": "付款",
       "notes": "",
       "category": "硬装"
     },
@@ -151,7 +151,7 @@
       "budgetPrice": 1500,
       "actualPrice": 1589,
       "purchaseChannel": "京东",
-      "status": "已付款",
+      "status": "付款",
       "notes": "",
       "category": "家电"
     },
@@ -409,11 +409,11 @@
     }
   ],
   "statistics": {
-    "totalBudget": 267720,
+    "totalBudget": 267721,
     "totalActual": 145743,
-    "budgetDifference": 121977,
+    "budgetDifference": 121978,
     "totalQuantity": 55,
-    "completedCount": 0,
-    "completionRate": 0
+    "completedCount": 6,
+    "completionRate": 21
   }
 }
