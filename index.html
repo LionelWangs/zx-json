@@ -190,12 +190,65 @@
             background-color: rgba(255, 69, 58, 0.15);
         }
 
-        /* 主容器 */
-        .container {
-            max-width: 1200px;
+        /* 布局容器 */
+        .layout-wrapper {
+            display: flex;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 32px 20px;
+            gap: 32px;
             animation: fadeUpIn 0.8s var(--ease-out) forwards;
+            align-items: flex-start;
+        }
+
+        .sidebar {
+            width: 180px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: sticky;
+            top: 80px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out);
+            text-align: left;
+            outline: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--card-bg);
+            color: var(--accent-blue);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--glass-border);
+        }
+
+        .nav-item i {
+            font-size: 20px;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         @keyframes fadeUpIn {
@@ -298,50 +351,10 @@
             margin-bottom: 32px;
         }
 
-        .charts-header-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            padding: 8px 12px;
-            margin-bottom: 16px;
-            border-radius: var(--radius-md);
-            transition: background 0.3s;
-        }
-        .charts-header-toggle:hover {
-            background: rgba(255,255,255,0.05);
-        }
-        .charts-header-toggle h3 {
-            font-size: 16px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-primary);
-        }
-        .charts-header-toggle i.toggle-icon {
-            font-size: 18px;
-            color: var(--text-secondary);
-            transition: transform 0.4s var(--ease-spring);
-        }
-        .charts-header-toggle.collapsed i.toggle-icon {
-            transform: rotate(-180deg);
-        }
-
         .charts-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 20px;
-            transition: all 0.5s var(--ease-spring);
-            transform-origin: top;
-            opacity: 1;
-            transform: scaleY(1);
-        }
-
-        .charts-grid.collapsed {
-            display: none;
-            opacity: 0;
-            transform: scaleY(0);
         }
 
         .chart-card {
@@ -748,9 +761,23 @@
                 flex-wrap: wrap;
             }
 
-            /* 容器适配 */
-            .container {
-                padding: 16px 16px; /* 增加整体缩进 */
+            /* 布局适配 */
+            .layout-wrapper {
+                flex-direction: column;
+                padding: 16px;
+                gap: 16px;
+            }
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                position: static;
+                overflow-x: auto;
+            }
+            .nav-item {
+                flex: 1;
+                justify-content: center;
+                padding: 10px;
+                white-space: nowrap;
             }
 
             /* 统计卡片适配：改为两列 */
@@ -970,9 +997,19 @@
         </div>
     </header>
 
-    <div class="container">
-        <!-- 工具栏 (搜索、筛选) -->
-        <div class="toolbar">
+    <div class="layout-wrapper">
+        <aside class="sidebar">
+            <button class="nav-item active" onclick="switchTab('table')" id="tab-table">
+                <i class="ph ph-list-dashes"></i> 预算明细
+            </button>
+            <button class="nav-item" onclick="switchTab('charts')" id="tab-charts">
+                <i class="ph ph-chart-pie-slice"></i> 图表分析
+            </button>
+        </aside>
+
+        <div class="main-content">
+            <!-- 工具栏 (搜索、筛选) -->
+            <div class="toolbar" id="toolbarView">
             <div class="search-box">
                 <i class="ph ph-magnifying-glass"></i>
                 <input type="text" class="search-input" id="searchInput" placeholder="搜索名称、品牌或备注..." oninput="handleFilter()">
@@ -1012,11 +1049,7 @@
         </div>
 
         <!-- 图表与数据可视化 -->
-        <div class="charts-container">
-            <div class="charts-header-toggle" onclick="toggleCharts()" id="chartsToggleBtn">
-                <h3><i class="ph ph-chart-pie-slice"></i> 数据分析看板</h3>
-                <i class="ph ph-caret-up toggle-icon"></i>
-            </div>
+        <div class="charts-container" id="chartsView" style="display: none;">
             <div class="charts-grid" id="chartsGrid">
                 <div class="chart-card">
                     <div class="chart-header"><i class="ph ph-chart-bar"></i> 预算 vs 实际支出对比</div>
@@ -1034,7 +1067,7 @@
         </div>
 
         <!-- 数据表格 -->
-        <div class="table-container">
+        <div class="table-container" id="tableView">
             <table>
                 <thead>
                     <tr>
@@ -1213,10 +1246,33 @@
         // 图表实例
         let barChartInstance = null;
         let doughnutChartInstance = null;
-        let chartsCollapsed = false; // 图表收起状态
 
         // 默认数据
         const defaultData = [];
+
+        let currentTab = 'table'; // 'table' or 'charts'
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update sidebar UI
+            document.getElementById('tab-table').classList.toggle('active', tab === 'table');
+            document.getElementById('tab-charts').classList.toggle('active', tab === 'charts');
+            
+            // Update content visibility
+            document.getElementById('toolbarView').style.display = tab === 'table' ? 'flex' : 'none';
+            document.getElementById('tableView').style.display = tab === 'table' ? 'block' : 'none';
+            document.getElementById('chartsView').style.display = tab === 'charts' ? 'block' : 'none';
+
+            if (tab === 'charts') {
+                // Resize charts
+                if (barChartInstance) barChartInstance.resize();
+                if (doughnutChartInstance) doughnutChartInstance.resize();
+            }
+            
+            // Save tab state (optional)
+            localStorage.setItem(CACHE_KEY + '_current_tab', tab);
+        }
 
         function init() {
             const cached = localStorage.getItem(CACHE_KEY);
@@ -1231,11 +1287,11 @@
             }
             
             // 恢复图表折叠状态
-            const cachedCollapsed = localStorage.getItem(CACHE_KEY + '_charts_collapsed');
-            if (cachedCollapsed === 'true') {
-                chartsCollapsed = true;
-                document.getElementById('chartsGrid').classList.add('collapsed');
-                document.getElementById('chartsToggleBtn').classList.add('collapsed');
+            const savedTab = localStorage.getItem(CACHE_KEY + '_current_tab');
+            if (savedTab) {
+                switchTab(savedTab);
+            } else {
+                switchTab('table');
             }
             
             // 恢复 GitHub 配置
@@ -1261,25 +1317,6 @@
 
         function saveToCache() {
             localStorage.setItem(CACHE_KEY, JSON.stringify(appliances));
-            localStorage.setItem(CACHE_KEY + '_charts_collapsed', chartsCollapsed);
-        }
-
-        function toggleCharts() {
-            chartsCollapsed = !chartsCollapsed;
-            const grid = document.getElementById('chartsGrid');
-            const btn = document.getElementById('chartsToggleBtn');
-            
-            if (chartsCollapsed) {
-                grid.classList.add('collapsed');
-                btn.classList.add('collapsed');
-            } else {
-                grid.classList.remove('collapsed');
-                btn.classList.remove('collapsed');
-                // 重新渲染一次图表以防止尺寸计算错误
-                if (barChartInstance) barChartInstance.resize();
-                if (doughnutChartInstance) doughnutChartInstance.resize();
-            }
-            saveToCache();
         }
 
         // --- 数据处理层 (过滤与排序) ---
