@@ -11,7 +11,7 @@
       "budgetPrice": 12600,
       "actualPrice": 12600,
       "purchaseChannel": "线下实体店",
-      "status": "已完成",
+      "status": "完成",
       "notes": ""
     },
     {
@@ -24,7 +24,7 @@
       "budgetPrice": 27300,
       "actualPrice": 27300,
       "purchaseChannel": "线下实体店",
-      "status": "已完成",
+      "status": "完成",
       "notes": ""
     },
     {
@@ -37,7 +37,7 @@
       "budgetPrice": 4194,
       "actualPrice": 4194,
       "purchaseChannel": "线下实体店",
-      "status": "已完成",
+      "status": "完成",
       "notes": ""
     },
     {
@@ -50,7 +50,7 @@
       "budgetPrice": 14000,
       "actualPrice": 10000,
       "purchaseChannel": "线下实体店",
-      "status": "已完成",
+      "status": "完成",
       "notes": ""
     },
     {
@@ -63,7 +63,7 @@
       "budgetPrice": 400,
       "actualPrice": 460,
       "purchaseChannel": "京东",
-      "status": "已完成",
+      "status": "完成",
       "notes": ""
     },
     {
@@ -76,7 +76,7 @@
       "budgetPrice": 3000,
       "actualPrice": 3000,
       "purchaseChannel": "线下实体店",
-      "status": "已完成",
+      "status": "完成",
       "notes": ""
     },
     {
@@ -89,7 +89,7 @@
       "budgetPrice": 69000,
       "actualPrice": 69000,
       "purchaseChannel": "线下实体店",
-      "status": "已付款",
+      "status": "付款",
       "notes": "已经付了 定金2000+设计费 8000+一期 18650+二期 20650+三期 15930"
     },
     {
@@ -102,7 +102,7 @@
       "budgetPrice": 8000,
       "actualPrice": 3800,
       "purchaseChannel": "线下实体店",
-      "status": "已付款",
+      "status": "付款",
       "notes": "无主灯"
     },
     {
@@ -115,7 +115,7 @@
       "budgetPrice": 12000,
       "actualPrice": 11600,
       "purchaseChannel": "线下实体店",
-      "status": "已付款",
+      "status": "付款",
       "notes": ""
     },
     {
@@ -128,7 +128,7 @@
       "budgetPrice": 0,
       "actualPrice": 2200,
       "purchaseChannel": "线下实体店",
-      "status": "已付款",
+      "status": "付款",
       "notes": ""
     },
     {
@@ -141,7 +141,7 @@
       "budgetPrice": 1500,
       "actualPrice": 1589,
       "purchaseChannel": "京东",
-      "status": "已付款",
+      "status": "付款",
       "notes": ""
     },
     {

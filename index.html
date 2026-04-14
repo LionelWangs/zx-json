@@ -570,12 +570,15 @@
         .status-badge {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             padding: 4px 12px;
             border-radius: 980px;
             font-size: 12px;
             font-weight: 600;
             letter-spacing: 0.01em;
             box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+            white-space: nowrap;
+            min-width: 60px;
         }
 
         .status-done { background: rgba(50, 215, 75, 0.15); color: var(--accent-green); }
@@ -1023,8 +1026,8 @@
             <div class="filter-group" id="statusFilter">
                 <button class="filter-btn active" data-status="all" onclick="setFilter('all')">全部状态</button>
                 <button class="filter-btn" data-status="待购" onclick="setFilter('待购')">待购</button>
-                <button class="filter-btn" data-status="已付款" onclick="setFilter('已付款')">已付款</button>
-                <button class="filter-btn" data-status="已完成" onclick="setFilter('已完成')">已完成</button>
+                <button class="filter-btn" data-status="付款" onclick="setFilter('付款')">付款</button>
+                <button class="filter-btn" data-status="完成" onclick="setFilter('完成')">完成</button>
             </div>
         </div>
 
@@ -1148,8 +1151,8 @@
                     <label>状态</label>
                     <select class="form-control" id="form-status">
                         <option value="待购">待购</option>
-                        <option value="已付款">已付款</option>
-                        <option value="已完成">已完成</option>
+                        <option value="付款">付款</option>
+                        <option value="完成">完成</option>
                     </select>
                 </div>
                 
@@ -1229,7 +1232,7 @@
         // 状态管理
         let appliances = [];
         let filteredData = []; // 用于搜索筛选和排序后的数据
-        let currentFilter = 'all'; // all, 待购, 已付款, 已完成
+        let currentFilter = 'all'; // all, 待购, 付款, 完成
         let currentCategoryFilter = 'all'; // all, 硬装, 家电, 必要支出
         let currentSearch = '';
         let sortConfig = { key: null, isDesc: false }; // 排序状态
@@ -1285,6 +1288,15 @@
             } else {
                 appliances = JSON.parse(JSON.stringify(defaultData));
             }
+            
+            // 兼容历史数据，迁移状态名称
+            appliances.forEach(item => {
+                if (item.status === '已完成') {
+                    item.status = '完成';
+                } else if (item.status === '已付款') {
+                    item.status = '付款';
+                }
+            });
             
             // 恢复图表折叠状态
             const savedTab = localStorage.getItem(CACHE_KEY + '_current_tab');
@@ -1394,7 +1406,7 @@
                     
                     // 状态排序映射优先级
                     if (sortConfig.key === 'status') {
-                        const statusWeight = { '已完成': 3, '已付款': 2, '待购': 1 };
+                        const statusWeight = { '完成': 3, '付款': 2, '待购': 1 };
                         valA = statusWeight[valA] || 0;
                         valB = statusWeight[valB] || 0;
                         return sortConfig.isDesc ? valB - valA : valA - valB;
@@ -1424,14 +1436,13 @@
             let chartLabels = [];
             let chartBudgets = [];
             let chartActuals = [];
-            let statusCount = { '待购': 0, '已付款': 0, '已完成': 0 };
+            let statusCount = { '待购': 0, '付款': 0, '完成': 0 };
 
-            // 统计始终基于全局数据计算 (appliances) 还是筛选后数据计算？
-            // 建议：顶部统计基于全局数据，让用户知道整体情况
-            appliances.forEach(item => {
+            // 统计基于筛选后的数据计算
+            filteredData.forEach(item => {
                 totalBudget += Number(item.budgetPrice) || 0;
                 totalActual += Number(item.actualPrice) || 0;
-                if (item.status === '已完成') completedCount++;
+                if (item.status === '完成') completedCount++;
                 
                 if (item.status) {
                     statusCount[item.status] = (statusCount[item.status] || 0) + 1;
@@ -1461,8 +1472,8 @@
 
                     // 状态徽章映射
                     let statusClass = 'status-pending';
-                    if (item.status === '已完成') statusClass = 'status-done';
-                    if (item.status === '已付款') statusClass = 'status-paid';
+                    if (item.status === '完成') statusClass = 'status-done';
+                    if (item.status === '付款') statusClass = 'status-paid';
 
                     const tr = document.createElement('tr');
                     tr.setAttribute('data-id', item.id);
@@ -1500,7 +1511,7 @@
 
             // 更新统计面板
             const diff = totalBudget - totalActual;
-            const rate = appliances.length > 0 ? Math.round((completedCount / appliances.length) * 100) : 0;
+            const rate = filteredData.length > 0 ? Math.round((completedCount / filteredData.length) * 100) : 0;
 
             // 数字滚动动画工具函数
             animateValue(document.getElementById('stat-budget'), totalBudget);
@@ -1626,14 +1637,14 @@
             
             if (doughnutChartInstance) doughnutChartInstance.destroy();
             
-            const totalStatus = statusCount['待购'] + statusCount['已付款'] + statusCount['已完成'];
+            const totalStatus = statusCount['待购'] + statusCount['付款'] + statusCount['完成'];
             
             doughnutChartInstance = new Chart(donutCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['待购', '已付款', '已完成'],
+                    labels: ['待购', '付款', '完成'],
                     datasets: [{
-                        data: totalStatus === 0 ? [1, 0, 0] : [statusCount['待购'], statusCount['已付款'], statusCount['已完成']],
+                        data: totalStatus === 0 ? [1, 0, 0] : [statusCount['待购'], statusCount['付款'], statusCount['完成']],
                         backgroundColor: [
                             'rgba(10, 132, 255, 0.8)', // 蓝
                             'rgba(255, 159, 10, 0.8)', // 橙
@@ -1919,7 +1930,7 @@
                 appliances.forEach(item => {
                     totalBudget += Number(item.budgetPrice) || 0;
                     totalActual += Number(item.actualPrice) || 0;
-                    if (item.status === '已完成') completedCount++;
+                    if (item.status === '完成') completedCount++;
                 });
 
                 const exportData = {
@@ -2136,7 +2147,7 @@
             appliances.forEach(item => {
                 totalBudget += Number(item.budgetPrice);
                 totalActual += Number(item.actualPrice);
-                if (item.status === '已完成') completedCount++;
+                if (item.status === '完成') completedCount++;
             });
 
             const exportData = {
@@ -2291,10 +2302,10 @@
                             const status = ws[cellRef].v;
                             cellStyle.alignment.horizontal = "center";
                             cellStyle.font.bold = true;
-                            if (status === '已完成') {
+                            if (status === '完成') {
                                 cellStyle.font.color = { rgb: "248A3D" };
                                 cellStyle.fill = { fgColor: { rgb: "EBF9F0" } };
-                            } else if (status === '已付款') {
+                            } else if (status === '付款') {
                                 cellStyle.font.color = { rgb: "B26800" };
                                 cellStyle.fill = { fgColor: { rgb: "FFF6E5" } };
                             } else {
