@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/14 08:43:58",
+  "exportTime": "2026/4/14 09:08:27",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -350,14 +350,42 @@
       "status": "待购",
       "notes": "活动价，原价9999",
       "category": "家电"
+    },
+    {
+      "id": 1777000100012,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "小米路由器 BE6500 Pro",
+      "brand": "小米",
+      "quantity": 1,
+      "budgetPrice": 599,
+      "actualPrice": 599,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "",
+      "category": "家电"
+    },
+    {
+      "id": 1777000100013,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "小米路由器 BE3000",
+      "brand": "小米",
+      "quantity": 1,
+      "budgetPrice": 299,
+      "actualPrice": 299,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "",
+      "category": "家电"
     }
   ],
   "statistics": {
-    "totalBudget": 260824,
-    "totalActual": 184614,
+    "totalBudget": 261722,
+    "totalActual": 185512,
     "budgetDifference": 76210,
-    "totalQuantity": 51,
+    "totalQuantity": 53,
     "completedCount": 6,
-    "completionRate": 24
+    "completionRate": 22
   }
 }
