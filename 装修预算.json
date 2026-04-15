@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/14 09:28:31",
+  "exportTime": "2026/4/15 09:36:45",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -406,14 +406,28 @@
       "status": "待购",
       "notes": "",
       "category": "家电"
+    },
+    {
+      "name": "止逆阀+烟道",
+      "category": "硬装",
+      "brand": "潜水艇",
+      "quantity": 1,
+      "budgetPrice": 100,
+      "actualPrice": 121,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "",
+      "color": "#ffffff",
+      "locked": false,
+      "id": 1776216993078.227
     }
   ],
   "statistics": {
-    "totalBudget": 267721,
+    "totalBudget": 267821,
     "totalActual": 145743,
-    "budgetDifference": 121978,
-    "totalQuantity": 55,
+    "budgetDifference": 122078,
+    "totalQuantity": 56,
     "completedCount": 6,
-    "completionRate": 21
+    "completionRate": 20
   }
 }
