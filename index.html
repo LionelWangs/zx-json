@@ -507,12 +507,12 @@
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            text-align: left;
+            text-align: center;
         }
 
         th {
             background: rgba(44, 44, 46, 0.6);
-            padding: 16px;
+            padding: 16px 12px; /* 稍微缩减左右内边距，给内容更多空间 */
             font-size: 13px;
             font-weight: 500;
             color: var(--text-secondary);
@@ -524,6 +524,7 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             user-select: none;
+            white-space: nowrap; /* 强制表头文字不换行 */
         }
         
         /* 表头排序交互 */
@@ -875,7 +876,7 @@
                 padding: 10px 4px;
                 font-size: 12px;
                 white-space: nowrap;
-                text-align: left !important;
+                text-align: center !important;
             }
 
             /* 名称列允许缩略展示 */
@@ -918,14 +919,14 @@
 
             /* 调整状态表头文字对齐和宽度 */
             table th:nth-child(9) {
-                text-align: left !important;
+                text-align: center !important;
                 width: 48px;
                 padding-left: 2px;
                 padding-right: 2px;
                 font-size: 12px; /* 恢复表头文字大小 */
             }
             table td:nth-child(9) {
-                text-align: left !important;
+                text-align: center !important;
                 width: 48px;
                 padding-left: 2px;
                 padding-right: 2px;
@@ -950,7 +951,7 @@
 
             /* 操作按钮缩减间距和宽度 */
             table th:last-child, table td:last-child {
-                text-align: left !important;
+                text-align: center !important;
                 padding-right: 0px;
                 padding-left: 0px;
                 width: 48px;
@@ -1099,7 +1100,7 @@
                     <tr>
                         <th width="40"></th>
                         <th class="sortable" onclick="handleSort('name')">名称 <i class="ph ph-caret-down"></i></th>
-                        <th class="sortable" width="80" onclick="handleSort('priority')">优先度 <i class="ph ph-caret-down"></i></th>
+                        <th class="sortable" width="85" onclick="handleSort('priority')">优先度 <i class="ph ph-caret-down"></i></th>
                         <th class="sortable" onclick="handleSort('category')">分类 <i class="ph ph-caret-down"></i></th>
                         <th class="sortable" onclick="handleSort('brand')">品牌 <i class="ph ph-caret-down"></i></th>
                         <th>数量</th>
@@ -1108,7 +1109,7 @@
                         <th>购买渠道</th>
                         <th class="sortable" onclick="handleSort('status')">状态 <i class="ph ph-caret-down"></i></th>
                         <th>备注</th>
-                        <th width="80" style="text-align: left;">操作</th>
+                        <th width="80" style="text-align: center;">操作</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -1563,7 +1564,7 @@
                                 ${item.notes || '-'}
                             </div>
                         </td>
-                        <td style="text-align: left; white-space: nowrap;">
+                        <td style="text-align: center; white-space: nowrap;">
                             <button class="btn btn-ghost" onclick="editData(${item.id})"><i class="ph ph-pencil-simple"></i></button>
                             <button class="btn btn-ghost btn-danger" onclick="deleteData(${item.id})"><i class="ph ph-trash"></i></button>
                         </td>
@@ -2323,7 +2324,7 @@
             // 基础数据行样式
             const baseStyle = {
                 font: { sz: 11, color: { rgb: "1D1D1F" }, name: "Arial" },
-                alignment: { vertical: "center", horizontal: "left" },
+                alignment: { vertical: "center", horizontal: "center" },
                 border: borderStyle
             };
 
