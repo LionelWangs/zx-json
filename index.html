@@ -2649,11 +2649,17 @@
                             
                             // 差额颜色
                             if (C === 7) {
-                                const diffPrice = bPrice - aPrice;
-                                if (diffPrice < 0) {
-                                    cellStyle.font.color = { rgb: "FF3B30" }; // 红
-                                } else if (diffPrice > 0) {
-                                    cellStyle.font.color = { rgb: "30D158" }; // 绿
+                                if (rowData.status === '待购') {
+                                    ws[cellRef].t = 's'; // 文本格式
+                                    cellStyle.font.color = { rgb: "8E8E93" }; // 灰色短横线
+                                    cellStyle.alignment.horizontal = "center";
+                                } else {
+                                    const diffPrice = bPrice - aPrice;
+                                    if (diffPrice < 0) {
+                                        cellStyle.font.color = { rgb: "FF3B30" }; // 红
+                                    } else if (diffPrice > 0) {
+                                        cellStyle.font.color = { rgb: "30D158" }; // 绿
+                                    }
                                 }
                             }
                         }
