@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/16 11:20:14",
+  "exportTime": "2026/4/16 11:47:15",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -13,7 +13,8 @@
       "purchaseChannel": "线下实体店",
       "status": "完成",
       "notes": "",
-      "category": "必要支出"
+      "category": "必要支出",
+      "priority": "高"
     },
     {
       "id": 1763208803454.422,
@@ -27,7 +28,8 @@
       "purchaseChannel": "线下实体店",
       "status": "完成",
       "notes": "",
-      "category": "家电"
+      "category": "家电",
+      "priority": "高"
     },
     {
       "id": 1766975566098.8591,
@@ -41,7 +43,8 @@
       "purchaseChannel": "线下实体店",
       "status": "完成",
       "notes": "",
-      "category": "必要支出"
+      "category": "必要支出",
+      "priority": "高"
     },
     {
       "id": 1766975566102.8591,
@@ -55,7 +58,8 @@
       "purchaseChannel": "线下实体店",
       "status": "完成",
       "notes": "",
-      "category": "硬装"
+      "category": "硬装",
+      "priority": "高"
     },
     {
       "id": 1772780942877.0815,
@@ -69,7 +73,8 @@
       "purchaseChannel": "京东",
       "status": "完成",
       "notes": "",
-      "category": "硬装"
+      "category": "硬装",
+      "priority": "高"
     },
     {
       "id": 1766975566103.8591,
@@ -83,7 +88,8 @@
       "purchaseChannel": "线下实体店",
       "status": "完成",
       "notes": "",
-      "category": "硬装"
+      "category": "硬装",
+      "priority": "高"
     },
     {
       "id": 1760340848585.455,
@@ -97,7 +103,8 @@
       "purchaseChannel": "线下实体店",
       "status": "付款",
       "notes": "已经付了 定金2000+设计费 8000+一期 18650+二期 20650+三期 15930",
-      "category": "硬装"
+      "category": "硬装",
+      "priority": "高"
     },
     {
       "id": 1766975566108.8591,
@@ -111,21 +118,8 @@
       "purchaseChannel": "线下实体店",
       "status": "付款",
       "notes": "无主灯",
-      "category": "家电"
-    },
-    {
-      "id": 1775993307164.5715,
-      "color": "#ffffff",
-      "locked": false,
-      "name": "窗台石",
-      "brand": "工厂",
-      "quantity": 1,
-      "budgetPrice": 1,
-      "actualPrice": 2200,
-      "purchaseChannel": "线下实体店",
-      "status": "付款",
-      "notes": "",
-      "category": "硬装"
+      "category": "家电",
+      "priority": "高"
     },
     {
       "id": 1766975566107.8591,
@@ -139,7 +133,23 @@
       "purchaseChannel": "线下实体店",
       "status": "付款",
       "notes": "",
-      "category": "硬装"
+      "category": "硬装",
+      "priority": "高"
+    },
+    {
+      "id": 1775993307164.5715,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "窗台石",
+      "brand": "工厂",
+      "quantity": 1,
+      "budgetPrice": 0,
+      "actualPrice": 2200,
+      "purchaseChannel": "线下实体店",
+      "status": "付款",
+      "notes": "",
+      "category": "硬装",
+      "priority": "高"
     },
     {
       "id": 1776051166293.0078,
@@ -153,7 +163,8 @@
       "purchaseChannel": "京东",
       "status": "付款",
       "notes": "",
-      "category": "家电"
+      "category": "家电",
+      "priority": "高"
     },
     {
       "id": 1766975566106.8591,
@@ -167,7 +178,8 @@
       "purchaseChannel": "",
       "status": "待购",
       "notes": "",
-      "category": "硬装"
+      "category": "硬装",
+      "priority": "高"
     },
     {
       "id": 1769858861468.739,
@@ -181,7 +193,8 @@
       "purchaseChannel": "",
       "status": "待购",
       "notes": "",
-      "category": "硬装"
+      "category": "硬装",
+      "priority": "高"
     },
     {
       "id": 1769858882057.6218,
@@ -195,7 +208,8 @@
       "purchaseChannel": "",
       "status": "待购",
       "notes": "",
-      "category": "硬装"
+      "category": "硬装",
+      "priority": "高"
     },
     {
       "id": 1777000100001,
@@ -209,7 +223,8 @@
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "",
-      "category": "家电"
+      "category": "家电",
+      "priority": "低"
     },
     {
       "id": 1777000100002,
@@ -223,7 +238,8 @@
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "活动价，原价5397",
-      "category": "家电"
+      "category": "家电",
+      "priority": "高"
     },
     {
       "id": 1777000100003,
@@ -237,35 +253,38 @@
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "",
-      "category": "家电"
+      "category": "家电",
+      "priority": "中"
     },
     {
       "id": 1777000100004,
       "color": "#ffffff",
       "locked": false,
-      "name": "易来 Z10",
-      "brand": "易来",
+      "name": "米家智能浴霸P1",
+      "brand": "米家",
       "quantity": 1,
       "budgetPrice": 1399,
-      "actualPrice": 389,
+      "actualPrice": 1299,
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "",
-      "category": "家电"
+      "category": "家电",
+      "priority": "中"
     },
     {
       "id": 1777000100005,
       "color": "#ffffff",
       "locked": false,
-      "name": "米家智能浴霸 P1",
+      "name": "米家智能浴霸N1+米家控温淋浴花洒套装",
       "brand": "米家",
       "quantity": 1,
-      "budgetPrice": 1000,
-      "actualPrice": 970,
+      "budgetPrice": 2198,
+      "actualPrice": 2198,
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "套装标价，N1单买约699+花洒约1499",
-      "category": "家电"
+      "category": "家电",
+      "priority": "中"
     },
     {
       "id": 1777000100006,
@@ -279,7 +298,8 @@
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "活动价，原价6198",
-      "category": "家电"
+      "category": "家电",
+      "priority": "高"
     },
     {
       "id": 1777000100007,
@@ -293,21 +313,8 @@
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "",
-      "category": "家电"
-    },
-    {
-      "name": "米家花洒 N1",
       "category": "家电",
-      "brand": "米家",
-      "quantity": 1,
-      "budgetPrice": 700,
-      "actualPrice": 699,
-      "purchaseChannel": "京东",
-      "status": "待购",
-      "notes": "",
-      "color": "#ffffff",
-      "locked": false,
-      "id": 1776309556193.5889
+      "priority": "中"
     },
     {
       "id": 1777000100008,
@@ -321,7 +328,8 @@
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "活动价，原价10298",
-      "category": "家电"
+      "category": "家电",
+      "priority": "高"
     },
     {
       "id": 1777000100009,
@@ -335,7 +343,8 @@
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "",
-      "category": "家电"
+      "category": "家电",
+      "priority": "低"
     },
     {
       "id": 1777000100010,
@@ -349,7 +358,8 @@
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "",
-      "category": "家电"
+      "category": "家电",
+      "priority": "高"
     },
     {
       "id": 1777000100011,
@@ -363,7 +373,8 @@
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "活动价，原价9999",
-      "category": "家电"
+      "category": "家电",
+      "priority": "高"
     },
     {
       "id": 1777000100012,
@@ -377,7 +388,8 @@
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "",
-      "category": "家电"
+      "category": "家电",
+      "priority": "高"
     },
     {
       "id": 1777000100013,
@@ -391,57 +403,16 @@
       "purchaseChannel": "京东",
       "status": "待购",
       "notes": "",
-      "category": "家电"
-    },
-    {
-      "id": 1777000100014,
-      "color": "#ffffff",
-      "locked": false,
-      "name": "智米智能马桶",
-      "brand": "智米",
-      "quantity": 1,
-      "budgetPrice": 2999,
-      "actualPrice": 2499,
-      "purchaseChannel": "京东",
-      "status": "待购",
-      "notes": "",
-      "category": "家电"
-    },
-    {
-      "id": 1777000100015,
-      "color": "#ffffff",
-      "locked": false,
-      "name": "智米智能马桶",
-      "brand": "智米",
-      "quantity": 1,
-      "budgetPrice": 2999,
-      "actualPrice": 2499,
-      "purchaseChannel": "京东",
-      "status": "待购",
-      "notes": "",
-      "category": "家电"
-    },
-    {
-      "name": "止逆阀+烟道",
-      "category": "硬装",
-      "brand": "潜水艇",
-      "quantity": 1,
-      "budgetPrice": 100,
-      "actualPrice": 121,
-      "purchaseChannel": "京东",
-      "status": "待购",
-      "notes": "",
-      "color": "#ffffff",
-      "locked": false,
-      "id": 1776216993078.227
+      "category": "家电",
+      "priority": "低"
     }
   ],
   "statistics": {
-    "totalBudget": 267323,
+    "totalBudget": 261722,
     "totalActual": 145743,
-    "budgetDifference": 121580,
-    "totalQuantity": 57,
+    "budgetDifference": 115979,
+    "totalQuantity": 53,
     "completedCount": 6,
-    "completionRate": 19
+    "completionRate": 22
   }
 }
