@@ -274,6 +274,8 @@
             border: 1px solid var(--glass-border);
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
+            position: relative;
+            z-index: 100;
         }
 
         .search-box {
@@ -476,13 +478,54 @@
         .stat-card.positive .value { color: var(--accent-green); }
         .stat-card.positive .label { color: var(--accent-green); opacity: 0.9; }
 
+        .column-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: rgba(44, 44, 46, 0.95); /* 更实一点的背景色避免透字 */
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 8px;
+            box-shadow: var(--shadow-lg); /* 增加阴影增强层级感 */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 140px;
+        }
+
+        .column-menu label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-primary);
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .column-menu label:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .column-menu input[type="checkbox"] {
+            accent-color: var(--accent-blue);
+        }
+
         /* 数据表格容器 (Apple Table) */
         .table-container {
             background: rgba(28, 28, 30, 0.45);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-sm);
-            overflow: hidden;
+            overflow-x: auto; /* 允许横向滚动以适应列宽调整 */
+            overflow-y: hidden;
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
             transition: box-shadow 0.4s var(--ease-out);
@@ -505,6 +548,7 @@
 
         table {
             width: 100%;
+            min-width: max-content; /* 允许表格根据内容撑开，修复滚动时背景截断 */
             border-collapse: separate;
             border-spacing: 0;
             text-align: center;
@@ -525,6 +569,24 @@
             -webkit-backdrop-filter: blur(20px);
             user-select: none;
             white-space: nowrap; /* 强制表头文字不换行 */
+        }
+        
+        /* 表头列宽拖拽手柄 */
+        .resize-handle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 15;
+            transition: background 0.2s;
+        }
+        
+        .resize-handle:hover,
+        .resize-handle.active {
+            background: var(--accent-blue);
         }
         
         /* 表头排序交互 */
@@ -585,7 +647,7 @@
         tr.row-over-budget:hover td {
             background: rgba(255, 69, 58, 0.12);
         }
-        tr.row-over-budget td:nth-child(6) {
+        tr.row-over-budget td[data-col="actualPrice"] {
             color: var(--accent-red);
             font-weight: 600;
         }
@@ -845,93 +907,108 @@
                 width: 100%;
             }
             .filter-group {
-                justify-content: space-between;
+                justify-content: flex-start;
                 overflow-x: auto;
                 white-space: nowrap;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                padding-bottom: 4px; /* 防止滚动条遮挡 */
+            }
+            
+            /* 列显示菜单在移动端位置调整 */
+            .column-menu {
+                right: auto;
+                left: 0;
             }
             
             /* 表格容器允许横向滚动，但尽量一屏展示 */
             .table-container {
-                overflow-x: auto;
+                overflow-x: hidden; /* 移动端禁止横向滚动 */
                 border-radius: var(--radius-md);
             }
 
             table {
                 width: 100%;
-                table-layout: fixed;
-                min-width: 320px; /* 保证表格有一个最小宽度避免挤压过度 */
-            }
-
-            /* 表格响应式处理：隐藏不重要的列 */
-            table th:nth-child(1), table td:nth-child(1), /* 拖拽手柄 */
-            table th:nth-child(4), table td:nth-child(4), /* 品牌 */
-            table th:nth-child(5), table td:nth-child(5), /* 数量 */
-            table th:nth-child(8), table td:nth-child(8), /* 购买渠道 */
-            table th:nth-child(10), table td:nth-child(10)  /* 备注 */ {
-                display: none;
+                table-layout: fixed; /* 恢复固定布局，强制在一屏内 */
+                min-width: 100%;
             }
 
             /* 表格文字与内边距极简压缩以适应单屏 */
             table th, table td {
-                padding: 10px 4px;
+                padding: 10px 2px; /* 进一步压缩内边距 */
                 font-size: 12px;
                 white-space: nowrap;
                 text-align: center !important;
             }
 
-            /* 名称列允许缩略展示 */
-            table th:nth-child(2), table td:nth-child(2) {
-                width: 100px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                padding-left: 2px !important;
-                padding-right: 2px;
+            /* 移动端只展示核心字段，隐藏其他列 */
+            table th[data-col="drag"], table td[data-col="drag"],
+            table th[data-col="priority"], table td[data-col="priority"],
+            table th[data-col="category"], table td[data-col="category"],
+            table th[data-col="brand"], table td[data-col="brand"],
+            table th[data-col="quantity"], table td[data-col="quantity"],
+            table th[data-col="diffPrice"], table td[data-col="diffPrice"],
+            table th[data-col="channel"], table td[data-col="channel"],
+            table th[data-col="notes"], table td[data-col="notes"] {
+                display: none !important;
             }
 
-            /* 分类列在移动端缩小 */
-            table th:nth-child(3), table td:nth-child(3) {
-                width: 40px;
-                font-size: 11px;
-                padding-left: 2px;
-                padding-right: 2px;
+            /* 名称列允许换行展示以适应固定宽度 */
+            table th[data-col="name"], table td[data-col="name"] {
+                width: auto !important; /* 强制覆盖 JS 设置的宽度 */
+                min-width: 0 !important;
+                max-width: none !important;
+                white-space: normal; /* 允许换行 */
+                word-break: break-all;
+                padding-left: 4px !important;
+                padding-right: 4px;
+                text-align: left !important; /* 名称在移动端左对齐更易读 */
             }
 
             /* 预算和实际金额列表头缩短文字 */
-            table th:nth-child(6), table th:nth-child(7) {
+            table th[data-col="budgetPrice"], table th[data-col="actualPrice"] {
                 font-size: 0;
                 padding-left: 2px;
                 padding-right: 2px;
-                width: 50px;
+                width: 50px !important; /* 强制固定宽度，忽略 JS 拖拽记录 */
+                min-width: 50px !important;
+                max-width: 50px !important;
             }
-            table th:nth-child(6)::before { content: "预算"; font-size: 11px; }
-            table th:nth-child(7)::before { content: "实际"; font-size: 11px; }
-            table th:nth-child(6) i, table th:nth-child(7) i { font-size: 14px; margin-left: 0px; }
+            table th[data-col="budgetPrice"]::before { content: "预算"; font-size: 11px; }
+            table th[data-col="actualPrice"]::before { content: "实际"; font-size: 11px; }
+            table th[data-col="budgetPrice"] i, table th[data-col="actualPrice"] i { font-size: 14px; margin-left: 0px; }
             
             /* 数据行缩小金额字体 */
-            table td:nth-child(6), table td:nth-child(7) {
+            table td[data-col="budgetPrice"], table td[data-col="actualPrice"] {
                 font-size: 11px;
                 padding-left: 2px;
                 padding-right: 2px;
-                width: 50px;
+                width: 50px !important; /* 强制固定宽度 */
+                min-width: 50px !important;
+                max-width: 50px !important;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
 
             /* 调整状态表头文字对齐和宽度 */
-            table th:nth-child(9) {
+            table th[data-col="status"] {
                 text-align: center !important;
-                width: 48px;
+                width: 48px !important;
+                min-width: 48px !important;
+                max-width: 48px !important;
                 padding-left: 2px;
                 padding-right: 2px;
                 font-size: 12px; /* 恢复表头文字大小 */
             }
-            table td:nth-child(9) {
+            table td[data-col="status"] {
                 text-align: center !important;
-                width: 48px;
+                width: 48px !important;
+                min-width: 48px !important;
+                max-width: 48px !important;
                 padding-left: 2px;
                 padding-right: 2px;
             }
-            table th:nth-child(9) i {
+            table th[data-col="status"] i {
                 font-size: 14px;
                 margin-left: 2px;
             }
@@ -939,6 +1016,7 @@
             .status-badge {
                 width: 10px;
                 height: 10px;
+                min-width: 10px;
                 padding: 0;
                 font-size: 0;
                 border-radius: 50%;
@@ -950,17 +1028,19 @@
             .status-pending { background: var(--accent-blue); box-shadow: 0 0 8px rgba(10, 132, 255, 0.4); }
 
             /* 操作按钮缩减间距和宽度 */
-            table th:last-child, table td:last-child {
+            table th[data-col="actions"], table td[data-col="actions"] {
                 text-align: center !important;
                 padding-right: 0px;
                 padding-left: 0px;
-                width: 48px;
+                width: 48px !important;
+                min-width: 48px !important;
+                max-width: 48px !important;
             }
-            table td:last-child .btn {
+            table td[data-col="actions"] .btn {
                 padding: 2px;
                 gap: 0;
             }
-            table td:last-child .btn i {
+            table td[data-col="actions"] .btn i {
                 font-size: 16px; /* 调大操作图标字体以便点击 */
             }
 
@@ -1037,23 +1117,42 @@
         <div class="main-content">
             <!-- 工具栏 (搜索、筛选) -->
             <div class="toolbar" id="toolbarView">
-            <div class="search-box">
-                <i class="ph ph-magnifying-glass"></i>
-                <input type="text" class="search-input" id="searchInput" placeholder="搜索名称、品牌或备注..." oninput="handleFilter()">
+                <div class="search-box">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索名称、品牌或备注..." oninput="handleFilter()">
+                </div>
+                <div class="filter-group" id="categoryFilter" style="margin-right: auto; margin-left: 12px;">
+                    <button class="filter-btn active" data-category="all" onclick="setCategoryFilter('all')">全部分类</button>
+                    <button class="filter-btn" data-category="硬装" onclick="setCategoryFilter('硬装')">硬装</button>
+                    <button class="filter-btn" data-category="家电" onclick="setCategoryFilter('家电')">家电</button>
+                    <button class="filter-btn" data-category="必要支出" onclick="setCategoryFilter('必要支出')">必要支出</button>
+                </div>
+                <div class="filter-group" id="statusFilter">
+                    <button class="filter-btn active" data-status="all" onclick="setFilter('all')">全部状态</button>
+                    <button class="filter-btn" data-status="待购" onclick="setFilter('待购')">待购</button>
+                    <button class="filter-btn" data-status="付款" onclick="setFilter('付款')">付款</button>
+                    <button class="filter-btn" data-status="完成" onclick="setFilter('完成')">完成</button>
+                </div>
+                <!-- 列展示筛选 -->
+                <div class="filter-group column-filter" id="columnFilter" style="margin-left: 12px; position: relative;">
+                    <button class="filter-btn" onclick="toggleColumnMenu()">
+                        <i class="ph ph-columns"></i> 列显示 <i class="ph ph-caret-down" style="font-size: 12px; margin-left: 4px;"></i>
+                    </button>
+                    <div id="columnMenu" class="column-menu" style="display: none;">
+                        <label><input type="checkbox" checked onchange="toggleColumn('priority')"> 优先度</label>
+                        <label><input type="checkbox" checked onchange="toggleColumn('category')"> 分类</label>
+                        <label><input type="checkbox" checked onchange="toggleColumn('brand')"> 品牌</label>
+                        <label><input type="checkbox" checked onchange="toggleColumn('quantity')"> 数量</label>
+                        <label><input type="checkbox" checked onchange="toggleColumn('budgetPrice')"> 预算金额</label>
+                        <label><input type="checkbox" checked onchange="toggleColumn('actualPrice')"> 实际金额</label>
+                        <label><input type="checkbox" checked onchange="toggleColumn('diffPrice')"> 差额</label>
+                        <label><input type="checkbox" checked onchange="toggleColumn('channel')"> 购买渠道</label>
+                        <label><input type="checkbox" checked onchange="toggleColumn('status')"> 状态</label>
+                        <label><input type="checkbox" checked onchange="toggleColumn('notes')"> 备注</label>
+                        <label><input type="checkbox" checked onchange="toggleColumn('actions')"> 操作</label>
+                    </div>
+                </div>
             </div>
-            <div class="filter-group" id="categoryFilter" style="margin-right: auto; margin-left: 12px;">
-                <button class="filter-btn active" data-category="all" onclick="setCategoryFilter('all')">全部分类</button>
-                <button class="filter-btn" data-category="硬装" onclick="setCategoryFilter('硬装')">硬装</button>
-                <button class="filter-btn" data-category="家电" onclick="setCategoryFilter('家电')">家电</button>
-                <button class="filter-btn" data-category="必要支出" onclick="setCategoryFilter('必要支出')">必要支出</button>
-            </div>
-            <div class="filter-group" id="statusFilter">
-                <button class="filter-btn active" data-status="all" onclick="setFilter('all')">全部状态</button>
-                <button class="filter-btn" data-status="待购" onclick="setFilter('待购')">待购</button>
-                <button class="filter-btn" data-status="付款" onclick="setFilter('付款')">付款</button>
-                <button class="filter-btn" data-status="完成" onclick="setFilter('完成')">完成</button>
-            </div>
-        </div>
 
         <!-- 统计面板 -->
         <div class="stats-grid">
@@ -1098,18 +1197,19 @@
             <table>
                 <thead>
                     <tr>
-                        <th width="40"></th>
-                        <th class="sortable" onclick="handleSort('name')">名称 <i class="ph ph-caret-down"></i></th>
-                        <th class="sortable" width="85" onclick="handleSort('priority')">优先度 <i class="ph ph-caret-down"></i></th>
-                        <th class="sortable" onclick="handleSort('category')">分类 <i class="ph ph-caret-down"></i></th>
-                        <th class="sortable" onclick="handleSort('brand')">品牌 <i class="ph ph-caret-down"></i></th>
-                        <th>数量</th>
-                        <th class="sortable" onclick="handleSort('budgetPrice')">预算金额 <i class="ph ph-caret-down"></i></th>
-                        <th class="sortable" onclick="handleSort('actualPrice')">实际金额 <i class="ph ph-caret-down"></i></th>
-                        <th>购买渠道</th>
-                        <th class="sortable" onclick="handleSort('status')">状态 <i class="ph ph-caret-down"></i></th>
-                        <th>备注</th>
-                        <th width="80" style="text-align: center;">操作</th>
+                        <th width="40" data-col="drag"></th>
+                        <th class="sortable" onclick="handleSort('name')" data-col="name">名称 <i class="ph ph-caret-down"></i></th>
+                        <th class="sortable" width="85" onclick="handleSort('priority')" data-col="priority">优先度 <i class="ph ph-caret-down"></i></th>
+                        <th class="sortable" onclick="handleSort('category')" data-col="category">分类 <i class="ph ph-caret-down"></i></th>
+                        <th class="sortable" onclick="handleSort('brand')" data-col="brand">品牌 <i class="ph ph-caret-down"></i></th>
+                        <th data-col="quantity">数量</th>
+                        <th class="sortable" onclick="handleSort('budgetPrice')" data-col="budgetPrice">预算金额 <i class="ph ph-caret-down"></i></th>
+                        <th class="sortable" onclick="handleSort('actualPrice')" data-col="actualPrice">实际金额 <i class="ph ph-caret-down"></i></th>
+                        <th class="sortable" onclick="handleSort('diffPrice')" data-col="diffPrice">差额 <i class="ph ph-caret-down"></i></th>
+                        <th data-col="channel">购买渠道</th>
+                        <th class="sortable" onclick="handleSort('status')" data-col="status">状态 <i class="ph ph-caret-down"></i></th>
+                        <th data-col="notes">备注</th>
+                        <th width="80" style="text-align: center;" data-col="actions">操作</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -1270,6 +1370,8 @@
         let currentCategoryFilter = 'all'; // all, 硬装, 家电, 必要支出
         let currentSearch = '';
         let sortConfig = { key: null, isDesc: false }; // 恢复为默认手动排序，以便使用拖拽功能
+        let hiddenColumns = new Set(); // 存储被隐藏的列 data-col 名字
+        let columnWidths = {}; // 存储拖拽自定义的列宽
         
         // GitHub 同步配置
         let githubConfig = {
@@ -1323,6 +1425,14 @@
                 appliances = JSON.parse(JSON.stringify(defaultData));
             }
             
+            // 恢复自定义列宽
+            const savedWidths = localStorage.getItem(CACHE_KEY + '_col_widths');
+            if (savedWidths) {
+                try {
+                    columnWidths = JSON.parse(savedWidths);
+                } catch(e) {}
+            }
+            
             // 兼容历史数据，迁移状态名称，添加默认优先度
             appliances.forEach(item => {
                 if (item.status === '已完成') {
@@ -1353,6 +1463,19 @@
                 switchTab('table');
             }
             
+            // 恢复隐藏列状态
+            const savedHiddenCols = localStorage.getItem(CACHE_KEY + '_hidden_cols');
+            if (savedHiddenCols) {
+                try {
+                    const parsedCols = JSON.parse(savedHiddenCols);
+                    parsedCols.forEach(col => {
+                        hiddenColumns.add(col);
+                        const checkbox = document.querySelector(`.column-menu input[onchange="toggleColumn('${col}')"]`);
+                        if (checkbox) checkbox.checked = false;
+                    });
+                } catch(e) {}
+            }
+            
             // 恢复 GitHub 配置
             const cachedGithub = localStorage.getItem(CACHE_KEY + '_github_config');
             if (cachedGithub) {
@@ -1372,10 +1495,111 @@
             
             applyFiltersAndSort();
             initSortable();
+            
+            // 初始化列宽拖拽
+            initResizableColumns();
+        }
+
+        // --- 列宽拖拽功能 ---
+        function initResizableColumns() {
+            let isResizing = false;
+            let currentTh = null;
+            let startX = 0;
+            let startWidth = 0;
+            let colName = '';
+
+            const ths = document.querySelectorAll('th[data-col]');
+            ths.forEach(th => {
+                // 不给拖拽列添加手柄
+                if (th.getAttribute('data-col') === 'drag') return;
+                
+                const handle = document.createElement('div');
+                handle.className = 'resize-handle';
+                th.appendChild(handle);
+
+                const startDrag = function(e) {
+                    isResizing = true;
+                    currentTh = th;
+                    colName = th.getAttribute('data-col');
+                    startX = e.pageX || (e.touches && e.touches[0].pageX);
+                    startWidth = th.offsetWidth;
+                    handle.classList.add('active');
+                    e.stopPropagation();
+                    // 阻止默认行为可能会阻止手机滚动，对于表头手柄我们阻止它以防误触
+                };
+
+                handle.addEventListener('mousedown', startDrag);
+                handle.addEventListener('touchstart', startDrag, { passive: true });
+            });
+
+            const onMove = function(e) {
+                if (!isResizing || !currentTh) return;
+                const pageX = e.pageX || (e.touches && e.touches[0].pageX);
+                const diff = pageX - startX;
+                const newWidth = Math.max(40, startWidth + diff); // 最小宽度 40px
+                
+                // 实时更新当前列宽
+                columnWidths[colName] = newWidth;
+                
+                // 更新样式
+                currentTh.style.width = newWidth + 'px';
+                currentTh.style.minWidth = newWidth + 'px';
+                currentTh.style.maxWidth = newWidth + 'px';
+                
+                const tds = document.querySelectorAll(`td[data-col="${colName}"]`);
+                tds.forEach(td => {
+                    td.style.width = newWidth + 'px';
+                    td.style.minWidth = newWidth + 'px';
+                    td.style.maxWidth = newWidth + 'px';
+                });
+            };
+
+            const onEnd = function() {
+                if (isResizing) {
+                    isResizing = false;
+                    if (currentTh) {
+                        const handle = currentTh.querySelector('.resize-handle');
+                        if (handle) handle.classList.remove('active');
+                        currentTh = null;
+                        
+                        // 拖拽结束后保存到本地
+                        localStorage.setItem(CACHE_KEY + '_col_widths', JSON.stringify(columnWidths));
+                    }
+                }
+            };
+
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('touchmove', onMove, { passive: true });
+            document.addEventListener('mouseup', onEnd);
+            document.addEventListener('touchend', onEnd);
         }
 
         function saveToCache() {
             localStorage.setItem(CACHE_KEY, JSON.stringify(appliances));
+        }
+
+        function toggleColumnMenu() {
+            const menu = document.getElementById('columnMenu');
+            menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        // 点击页面其他地方关闭列筛选菜单
+        document.addEventListener('click', (e) => {
+            const filter = document.getElementById('columnFilter');
+            const menu = document.getElementById('columnMenu');
+            if (filter && menu && !filter.contains(e.target)) {
+                menu.style.display = 'none';
+            }
+        });
+
+        function toggleColumn(col) {
+            if (hiddenColumns.has(col)) {
+                hiddenColumns.delete(col);
+            } else {
+                hiddenColumns.add(col);
+            }
+            localStorage.setItem(CACHE_KEY + '_hidden_cols', JSON.stringify(Array.from(hiddenColumns)));
+            applyFiltersAndSort();
         }
 
         // --- 数据处理层 (过滤与排序) ---
@@ -1445,9 +1669,14 @@
                     let valB = b[sortConfig.key];
                     
                     // 数字排序
-                    if (['budgetPrice', 'actualPrice'].includes(sortConfig.key)) {
-                        valA = Number(valA) || 0;
-                        valB = Number(valB) || 0;
+                    if (['budgetPrice', 'actualPrice', 'diffPrice'].includes(sortConfig.key)) {
+                        if (sortConfig.key === 'diffPrice') {
+                            valA = (Number(a.budgetPrice) || 0) - (Number(a.actualPrice) || 0);
+                            valB = (Number(b.budgetPrice) || 0) - (Number(b.actualPrice) || 0);
+                        } else {
+                            valA = Number(valA) || 0;
+                            valB = Number(valB) || 0;
+                        }
                         return sortConfig.isDesc ? valB - valA : valA - valB;
                     }
                     
@@ -1514,9 +1743,25 @@
                 emptyState.style.display = 'none';
                 document.querySelector('table').style.display = 'table';
                 
+                // 应用列隐藏样式和列宽
+                document.querySelectorAll('th[data-col]').forEach(th => {
+                    const colName = th.getAttribute('data-col');
+                    if (hiddenColumns.has(colName)) {
+                        th.style.display = 'none';
+                    } else {
+                        th.style.display = 'table-cell'; // 覆盖可能存在的移动端 CSS 隐藏
+                        if (columnWidths[colName]) {
+                            th.style.width = columnWidths[colName] + 'px';
+                            th.style.minWidth = columnWidths[colName] + 'px';
+                            th.style.maxWidth = columnWidths[colName] + 'px';
+                        }
+                    }
+                });
+
                 filteredData.forEach((item, index) => {
                     const bPrice = Number(item.budgetPrice) || 0;
                     const aPrice = Number(item.actualPrice) || 0;
+                    const diffPrice = bPrice - aPrice;
                     
                     // 取前 15 项数据渲染柱状图（避免图表太挤）
                     if (index < 15) {
@@ -1527,6 +1772,15 @@
                     
                     // 判断超预算 (实际 > 预算，且预算不为0)
                     const isOverBudget = bPrice > 0 && aPrice > bPrice;
+
+                    let diffHtml = '';
+                    if (diffPrice < 0) {
+                        diffHtml = `<span style="color: var(--accent-red); font-weight: 600;">${diffPrice.toLocaleString()}</span>`;
+                    } else if (diffPrice > 0) {
+                        diffHtml = `<span style="color: var(--accent-green); font-weight: 600;">+${diffPrice.toLocaleString()}</span>`;
+                    } else {
+                        diffHtml = `<span style="color: var(--text-secondary); font-weight: 600;">0</span>`;
+                    }
 
                     // 状态徽章映射
                     let statusClass = 'status-pending';
@@ -1549,26 +1803,44 @@
                         : `<div style="width:20px;"></div>`;
 
                     tr.innerHTML = `
-                        <td>${dragHtml}</td>
-                        <td style="font-weight: 600; color: var(--text-primary);" title="${item.name || '-'}">${item.name || '-'}</td>
-                        <td style="color: ${priorityColor}; font-weight: 600;">${item.priority || '-'}</td>
-                        <td style="color: var(--text-secondary);">${item.category || '-'}</td>
-                        <td style="color: var(--text-secondary);">${item.brand || '-'}</td>
-                        <td style="color: var(--text-secondary);">${item.quantity || 1}</td>
-                        <td title="¥${bPrice.toLocaleString()}">¥${bPrice.toLocaleString()}</td>
-                        <td style="font-weight: 600;" title="¥${aPrice.toLocaleString()}">¥${aPrice.toLocaleString()} ${isOverBudget ? '<i class="ph-fill ph-warning-circle" style="color: var(--accent-red); margin-left: 4px;"></i>' : ''}</td>
-                        <td style="color: var(--text-secondary);">${item.purchaseChannel || '-'}</td>
-                        <td><span class="status-badge ${statusClass}" title="${item.status}">${item.status}</span></td>
-                        <td style="color: var(--text-secondary); font-size: 13px; max-width: 200px;">
+                        <td data-col="drag">${dragHtml}</td>
+                        <td data-col="name" style="font-weight: 600; color: var(--text-primary);" title="${item.name || '-'}">${item.name || '-'}</td>
+                        <td data-col="priority" style="color: ${priorityColor}; font-weight: 600;">${item.priority || '-'}</td>
+                        <td data-col="category" style="color: var(--text-secondary);">${item.category || '-'}</td>
+                        <td data-col="brand" style="color: var(--text-secondary);">${item.brand || '-'}</td>
+                        <td data-col="quantity" style="color: var(--text-secondary);">${item.quantity || 1}</td>
+                        <td data-col="budgetPrice" title="¥${bPrice.toLocaleString()}">¥${bPrice.toLocaleString()}</td>
+                        <td data-col="actualPrice" style="font-weight: 600;" title="¥${aPrice.toLocaleString()}">¥${aPrice.toLocaleString()} ${isOverBudget ? '<i class="ph-fill ph-warning-circle" style="color: var(--accent-red); margin-left: 4px;"></i>' : ''}</td>
+                        <td data-col="diffPrice" title="¥${diffPrice.toLocaleString()}">${diffHtml}</td>
+                        <td data-col="channel" style="color: var(--text-secondary);">${item.purchaseChannel || '-'}</td>
+                        <td data-col="status"><span class="status-badge ${statusClass}" title="${item.status}">${item.status}</span></td>
+                        <td data-col="notes" style="color: var(--text-secondary); font-size: 13px; max-width: 200px;">
                             <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.notes || ''}">
                                 ${item.notes || '-'}
                             </div>
                         </td>
-                        <td style="text-align: center; white-space: nowrap;">
+                        <td data-col="actions" style="text-align: center; white-space: nowrap;">
                             <button class="btn btn-ghost" onclick="editData(${item.id})"><i class="ph ph-pencil-simple"></i></button>
                             <button class="btn btn-ghost btn-danger" onclick="deleteData(${item.id})"><i class="ph ph-trash"></i></button>
                         </td>
                     `;
+                    
+                    // 新增渲染后再次根据 hiddenColumns 隐藏 td，避免新行闪烁
+                    // 并且应用保存的列宽
+                    tr.querySelectorAll('td[data-col]').forEach(el => {
+                        const colName = el.getAttribute('data-col');
+                        if (hiddenColumns.has(colName)) {
+                            el.style.display = 'none';
+                        } else {
+                            el.style.display = 'table-cell'; // 覆盖移动端 CSS
+                            if (columnWidths[colName]) {
+                                el.style.width = columnWidths[colName] + 'px';
+                                el.style.minWidth = columnWidths[colName] + 'px';
+                                el.style.maxWidth = columnWidths[colName] + 'px';
+                            }
+                        }
+                    });
+
                     tbody.appendChild(tr);
                 });
             }
@@ -2283,18 +2555,23 @@
             }
 
             // 构造二维数组 (AOA)
-            const headers = ["名称", "优先度", "分类", "品牌", "数量", "预算金额(¥)", "实际金额(¥)", "购买渠道", "状态", "备注"];
+            const headers = ["名称", "优先度", "分类", "品牌", "数量", "预算金额(¥)", "实际金额(¥)", "差额(¥)", "购买渠道", "状态", "备注"];
             const aoa = [headers];
 
             dataToExport.forEach(item => {
+                const bPrice = Number(item.budgetPrice) || 0;
+                const aPrice = Number(item.actualPrice) || 0;
+                const diffPrice = bPrice - aPrice;
+
                 aoa.push([
                     item.name || '',
                     item.priority || '',
                     item.category || '',
                     item.brand || '',
                     item.quantity || 1,
-                    item.budgetPrice || 0,
-                    item.actualPrice || 0,
+                    bPrice,
+                    aPrice,
+                    diffPrice,
                     item.purchaseChannel || '',
                     item.status || '',
                     item.notes || ''
@@ -2357,20 +2634,30 @@
                         const isOverBudget = bPrice > 0 && aPrice > bPrice;
 
                         // 针对特定列的样式微调
-                        if (C === 5 || C === 6) {
+                        if (C === 5 || C === 6 || C === 7) {
                             // 金额列数字格式
                             ws[cellRef].t = 'n'; 
-                            cellStyle.font.bold = (C === 6); // 实际金额加粗
+                            cellStyle.font.bold = (C === 6 || C === 7); // 实际金额、差额加粗
                             cellStyle.alignment.horizontal = "right"; // 金额右对齐
                             
                             // 实际金额超预算变红
                             if (C === 6 && isOverBudget) {
                                 cellStyle.font.color = { rgb: "FF3B30" };
                             }
+                            
+                            // 差额颜色
+                            if (C === 7) {
+                                const diffPrice = bPrice - aPrice;
+                                if (diffPrice < 0) {
+                                    cellStyle.font.color = { rgb: "FF3B30" }; // 红
+                                } else if (diffPrice > 0) {
+                                    cellStyle.font.color = { rgb: "30D158" }; // 绿
+                                }
+                            }
                         }
 
                         // 状态列特殊颜色
-                        if (C === 8) {
+                        if (C === 9) {
                             const status = ws[cellRef].v;
                             cellStyle.alignment.horizontal = "center";
                             cellStyle.font.bold = true;
@@ -2401,19 +2688,19 @@
                         }
 
                         // 整行超预算时，名称列加个微红底色（可选）
-                        if (isOverBudget && C !== 8) {
+                        if (isOverBudget && C !== 9) {
                             cellStyle.fill = { fgColor: { rgb: "FFF2F2" } };
                         }
 
                         // 备注列、品牌列次要文本
-                        if (C === 3 || C === 7 || C === 9) {
+                        if (C === 3 || C === 8 || C === 10) {
                             if (!isOverBudget) { // 如果不是超预算行，设置灰色
                                 cellStyle.font.color = { rgb: "86868B" };
                             }
                         }
 
                         // 备注列允许换行
-                        if (C === 9) {
+                        if (C === 10) {
                             cellStyle.alignment.wrapText = true;
                         }
 
