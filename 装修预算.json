@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/16 14:09:36",
+  "exportTime": "2026/4/16 15:20:54",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -450,14 +450,29 @@
       "color": "#ffffff",
       "locked": false,
       "id": 1776319709062.6135
+    },
+    {
+      "name": "插座",
+      "category": "硬装",
+      "brand": "德力西",
+      "quantity": 69,
+      "budgetPrice": 1000,
+      "actualPrice": 560,
+      "purchaseChannel": "淘宝",
+      "priority": "高",
+      "status": "待购",
+      "notes": "",
+      "color": "#ffffff",
+      "locked": false,
+      "id": 1776324049191.0217
     }
   ],
   "statistics": {
-    "totalBudget": 263073,
+    "totalBudget": 264073,
     "totalActual": 145743,
-    "budgetDifference": 117330,
-    "totalQuantity": 67,
+    "budgetDifference": 118330,
+    "totalQuantity": 136,
     "completedCount": 6,
-    "completionRate": 20
+    "completionRate": 19
   }
 }
