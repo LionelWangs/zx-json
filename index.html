@@ -1269,7 +1269,7 @@
         let currentFilter = 'all'; // all, 待购, 付款, 完成
         let currentCategoryFilter = 'all'; // all, 硬装, 家电, 必要支出
         let currentSearch = '';
-        let sortConfig = { key: 'priority', isDesc: true }; // 排序状态，默认按优先度降序
+        let sortConfig = { key: null, isDesc: false }; // 恢复为默认手动排序，以便使用拖拽功能
         
         // GitHub 同步配置
         let githubConfig = {
