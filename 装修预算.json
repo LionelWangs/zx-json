@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/16 11:47:15",
+  "exportTime": "2026/4/16 13:36:40",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -227,19 +227,49 @@
       "priority": "低"
     },
     {
-      "id": 1777000100002,
+      "id": 1777000100020,
       "color": "#ffffff",
       "locked": false,
-      "name": "米家净水器Pro双出水1600G+前置过滤套装",
+      "name": "米家净水器2 Pro双出水1600G",
       "brand": "米家",
       "quantity": 1,
-      "budgetPrice": 5397,
-      "actualPrice": 3947,
+      "budgetPrice": 4299,
+      "actualPrice": 2499,
       "purchaseChannel": "京东",
       "status": "待购",
-      "notes": "活动价，原价5397",
+      "notes": "活动价，原价4299。专利双龙头双水路，直出纯净水+生活水，2026年4月新品",
       "category": "家电",
       "priority": "高"
+    },
+    {
+      "id": 1777000100021,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "米家前置过滤器Pro",
+      "brand": "米家",
+      "quantity": 1,
+      "budgetPrice": 349,
+      "actualPrice": 349,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "全屋入户净水第一道过滤，保护净水器滤芯寿命",
+      "category": "家电",
+      "priority": "高"
+    },
+    {
+      "id": 1777000100022,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "米家管线机 MG3-A",
+      "brand": "米家",
+      "quantity": 1,
+      "budgetPrice": 1099,
+      "actualPrice": 1099,
+      "purchaseChannel": "京东",
+      "status": "待购",
+      "notes": "壁挂式，2100W厚膜速热，3秒即热，定温定量，取水不用等待",
+      "category": "家电",
+      "priority": "中"
     },
     {
       "id": 1777000100003,
@@ -408,11 +438,11 @@
     }
   ],
   "statistics": {
-    "totalBudget": 261722,
+    "totalBudget": 262072,
     "totalActual": 145743,
-    "budgetDifference": 115979,
-    "totalQuantity": 53,
+    "budgetDifference": 116329,
+    "totalQuantity": 55,
     "completedCount": 6,
-    "completionRate": 22
+    "completionRate": 21
   }
 }
