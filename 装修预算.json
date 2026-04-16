@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/16 16:10:59",
+  "exportTime": "2026/4/16 16:14:46",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -92,6 +92,36 @@
       "priority": "高"
     },
     {
+      "id": 1776051166293.0078,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "射灯",
+      "brand": "领普 LD5 ",
+      "quantity": 27,
+      "budgetPrice": 1500,
+      "actualPrice": 1589,
+      "purchaseChannel": "京东",
+      "status": "付款",
+      "notes": "",
+      "category": "家电",
+      "priority": "高"
+    },
+    {
+      "id": 1775993307164.5715,
+      "color": "#ffffff",
+      "locked": false,
+      "name": "窗台石",
+      "brand": "工厂",
+      "quantity": 1,
+      "budgetPrice": 1,
+      "actualPrice": 2200,
+      "purchaseChannel": "线下实体店",
+      "status": "付款",
+      "notes": "",
+      "category": "硬装",
+      "priority": "高"
+    },
+    {
       "id": 1760340848585.455,
       "color": "#ffffff",
       "locked": false,
@@ -134,36 +164,6 @@
       "status": "付款",
       "notes": "",
       "category": "硬装",
-      "priority": "高"
-    },
-    {
-      "id": 1775993307164.5715,
-      "color": "#ffffff",
-      "locked": false,
-      "name": "窗台石",
-      "brand": "工厂",
-      "quantity": 1,
-      "budgetPrice": 1,
-      "actualPrice": 2200,
-      "purchaseChannel": "线下实体店",
-      "status": "付款",
-      "notes": "",
-      "category": "硬装",
-      "priority": "高"
-    },
-    {
-      "id": 1776051166293.0078,
-      "color": "#ffffff",
-      "locked": false,
-      "name": "射灯",
-      "brand": "领普 LD5 ",
-      "quantity": 27,
-      "budgetPrice": 1500,
-      "actualPrice": 1589,
-      "purchaseChannel": "京东",
-      "status": "付款",
-      "notes": "",
-      "category": "家电",
       "priority": "高"
     },
     {
@@ -445,7 +445,7 @@
       "actualPrice": 640,
       "purchaseChannel": "咸鱼",
       "priority": "高",
-      "status": "待购",
+      "status": "付款",
       "notes": "",
       "color": "#ffffff",
       "locked": false,
@@ -460,7 +460,7 @@
       "actualPrice": 560,
       "purchaseChannel": "淘宝",
       "priority": "高",
-      "status": "待购",
+      "status": "付款",
       "notes": "",
       "color": "#ffffff",
       "locked": false,
@@ -469,8 +469,8 @@
   ],
   "statistics": {
     "totalBudget": 264073,
-    "totalActual": 145743,
-    "budgetDifference": 118330,
+    "totalActual": 146943,
+    "budgetDifference": 117130,
     "totalQuantity": 136,
     "completedCount": 6,
     "completionRate": 19
