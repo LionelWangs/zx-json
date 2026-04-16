@@ -1099,6 +1099,7 @@
                     <tr>
                         <th width="40"></th>
                         <th class="sortable" onclick="handleSort('name')">名称 <i class="ph ph-caret-down"></i></th>
+                        <th class="sortable" width="80" onclick="handleSort('priority')">优先度 <i class="ph ph-caret-down"></i></th>
                         <th class="sortable" onclick="handleSort('category')">分类 <i class="ph ph-caret-down"></i></th>
                         <th class="sortable" onclick="handleSort('brand')">品牌 <i class="ph ph-caret-down"></i></th>
                         <th>数量</th>
@@ -1168,6 +1169,15 @@
                 <div class="form-group">
                     <label>购买渠道</label>
                     <input type="text" class="form-control" id="form-channel" placeholder="如：线下实体店、京东">
+                </div>
+                
+                <div class="form-group">
+                    <label>优先度</label>
+                    <select class="form-control" id="form-priority">
+                        <option value="高">高</option>
+                        <option value="中">中</option>
+                        <option value="低">低</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
@@ -1258,7 +1268,7 @@
         let currentFilter = 'all'; // all, 待购, 付款, 完成
         let currentCategoryFilter = 'all'; // all, 硬装, 家电, 必要支出
         let currentSearch = '';
-        let sortConfig = { key: null, isDesc: false }; // 排序状态
+        let sortConfig = { key: 'priority', isDesc: true }; // 排序状态，默认按优先度降序
         
         // GitHub 同步配置
         let githubConfig = {
@@ -1312,12 +1322,25 @@
                 appliances = JSON.parse(JSON.stringify(defaultData));
             }
             
-            // 兼容历史数据，迁移状态名称
+            // 兼容历史数据，迁移状态名称，添加默认优先度
             appliances.forEach(item => {
                 if (item.status === '已完成') {
                     item.status = '完成';
                 } else if (item.status === '已付款') {
                     item.status = '付款';
+                }
+                if (!item.priority) {
+                    item.priority = '中'; // 默认优先度
+                }
+            });
+            
+            // 初始化表头 UI 状态
+            document.querySelectorAll('th.sortable').forEach(th => {
+                th.classList.remove('active', 'desc');
+                const thOnclick = th.getAttribute('onclick');
+                if (thOnclick && thOnclick.includes(`'${sortConfig.key}'`)) {
+                    th.classList.add('active');
+                    if (sortConfig.isDesc) th.classList.add('desc');
                 }
             });
             
@@ -1435,6 +1458,14 @@
                         return sortConfig.isDesc ? valB - valA : valA - valB;
                     }
 
+                    // 优先度排序映射优先级
+                    if (sortConfig.key === 'priority') {
+                        const priorityWeight = { '高': 3, '中': 2, '低': 1 };
+                        valA = priorityWeight[valA] || 0;
+                        valB = priorityWeight[valB] || 0;
+                        return sortConfig.isDesc ? valB - valA : valA - valB;
+                    }
+
                     // 字符串排序
                     valA = String(valA || '');
                     valB = String(valB || '');
@@ -1500,6 +1531,11 @@
                     let statusClass = 'status-pending';
                     if (item.status === '完成') statusClass = 'status-done';
                     if (item.status === '付款') statusClass = 'status-paid';
+                    
+                    // 优先度映射
+                    let priorityColor = 'var(--text-secondary)';
+                    if (item.priority === '高') priorityColor = 'var(--accent-red)';
+                    else if (item.priority === '中') priorityColor = 'var(--accent-orange)';
 
                     const tr = document.createElement('tr');
                     tr.setAttribute('data-id', item.id);
@@ -1514,6 +1550,7 @@
                     tr.innerHTML = `
                         <td>${dragHtml}</td>
                         <td style="font-weight: 600; color: var(--text-primary);" title="${item.name || '-'}">${item.name || '-'}</td>
+                        <td style="color: ${priorityColor}; font-weight: 600;">${item.priority || '-'}</td>
                         <td style="color: var(--text-secondary);">${item.category || '-'}</td>
                         <td style="color: var(--text-secondary);">${item.brand || '-'}</td>
                         <td style="color: var(--text-secondary);">${item.quantity || 1}</td>
@@ -1823,6 +1860,7 @@
                 document.getElementById('form-budget').value = item.budgetPrice;
                 document.getElementById('form-actual').value = item.actualPrice;
                 document.getElementById('form-channel').value = item.purchaseChannel;
+                document.getElementById('form-priority').value = item.priority || '中';
                 document.getElementById('form-status').value = item.status;
                 document.getElementById('form-notes').value = item.notes;
             } else {
@@ -1830,6 +1868,7 @@
                 document.querySelectorAll('.form-control').forEach(el => el.value = '');
                 document.getElementById('form-id').value = '';
                 document.getElementById('form-category').value = '硬装';
+                document.getElementById('form-priority').value = '中';
                 document.getElementById('form-quantity').value = 1;
                 document.getElementById('form-budget').value = 0;
                 document.getElementById('form-actual').value = 0;
@@ -1855,6 +1894,7 @@
                 budgetPrice: Number(document.getElementById('form-budget').value) || 0,
                 actualPrice: Number(document.getElementById('form-actual').value) || 0,
                 purchaseChannel: document.getElementById('form-channel').value,
+                priority: document.getElementById('form-priority').value,
                 status: document.getElementById('form-status').value,
                 notes: document.getElementById('form-notes').value,
                 color: "#ffffff",
@@ -2242,12 +2282,13 @@
             }
 
             // 构造二维数组 (AOA)
-            const headers = ["名称", "分类", "品牌", "数量", "预算金额(¥)", "实际金额(¥)", "购买渠道", "状态", "备注"];
+            const headers = ["名称", "优先度", "分类", "品牌", "数量", "预算金额(¥)", "实际金额(¥)", "购买渠道", "状态", "备注"];
             const aoa = [headers];
 
             dataToExport.forEach(item => {
                 aoa.push([
                     item.name || '',
+                    item.priority || '',
                     item.category || '',
                     item.brand || '',
                     item.quantity || 1,
@@ -2315,20 +2356,20 @@
                         const isOverBudget = bPrice > 0 && aPrice > bPrice;
 
                         // 针对特定列的样式微调
-                        if (C === 4 || C === 5) {
+                        if (C === 5 || C === 6) {
                             // 金额列数字格式
                             ws[cellRef].t = 'n'; 
-                            cellStyle.font.bold = (C === 5); // 实际金额加粗
+                            cellStyle.font.bold = (C === 6); // 实际金额加粗
                             cellStyle.alignment.horizontal = "right"; // 金额右对齐
                             
                             // 实际金额超预算变红
-                            if (C === 5 && isOverBudget) {
+                            if (C === 6 && isOverBudget) {
                                 cellStyle.font.color = { rgb: "FF3B30" };
                             }
                         }
 
                         // 状态列特殊颜色
-                        if (C === 7) {
+                        if (C === 8) {
                             const status = ws[cellRef].v;
                             cellStyle.alignment.horizontal = "center";
                             cellStyle.font.bold = true;
@@ -2343,21 +2384,35 @@
                                 cellStyle.fill = { fgColor: { rgb: "E5F1FF" } };
                             }
                         }
+                        
+                        // 优先度列特殊颜色
+                        if (C === 1) {
+                            const priority = ws[cellRef].v;
+                            cellStyle.alignment.horizontal = "center";
+                            cellStyle.font.bold = true;
+                            if (priority === '高') {
+                                cellStyle.font.color = { rgb: "FF3B30" };
+                            } else if (priority === '中') {
+                                cellStyle.font.color = { rgb: "FF9F0A" };
+                            } else {
+                                cellStyle.font.color = { rgb: "8E8E93" };
+                            }
+                        }
 
                         // 整行超预算时，名称列加个微红底色（可选）
-                        if (isOverBudget && C !== 7) {
+                        if (isOverBudget && C !== 8) {
                             cellStyle.fill = { fgColor: { rgb: "FFF2F2" } };
                         }
 
                         // 备注列、品牌列次要文本
-                        if (C === 2 || C === 6 || C === 8) {
+                        if (C === 3 || C === 7 || C === 9) {
                             if (!isOverBudget) { // 如果不是超预算行，设置灰色
                                 cellStyle.font.color = { rgb: "86868B" };
                             }
                         }
 
                         // 备注列允许换行
-                        if (C === 8) {
+                        if (C === 9) {
                             cellStyle.alignment.wrapText = true;
                         }
 
