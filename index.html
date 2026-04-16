@@ -1733,9 +1733,9 @@
 
             // 统计基于筛选后的数据计算
             filteredData.forEach(item => {
-                totalBudget += Number(item.budgetPrice) || 0;
-                // 排除“待购”状态的项
+                // 排除“待购”状态的项计算实际支出和预算差额
                 if (item.status !== '待购') {
+                    totalBudget += Number(item.budgetPrice) || 0;
                     totalActual += Number(item.actualPrice) || 0;
                 }
                 if (item.status === '完成') completedCount++;
