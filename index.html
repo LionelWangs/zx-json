@@ -1774,7 +1774,9 @@
                     const isOverBudget = bPrice > 0 && aPrice > bPrice;
 
                     let diffHtml = '';
-                    if (diffPrice < 0) {
+                    if (item.status === '待购') {
+                        diffHtml = `<span style="color: var(--text-secondary); font-weight: 500;">-</span>`;
+                    } else if (diffPrice < 0) {
                         diffHtml = `<span style="color: var(--accent-red); font-weight: 600;">${diffPrice.toLocaleString()}</span>`;
                     } else if (diffPrice > 0) {
                         diffHtml = `<span style="color: var(--accent-green); font-weight: 600;">+${diffPrice.toLocaleString()}</span>`;
@@ -2561,7 +2563,7 @@
             dataToExport.forEach(item => {
                 const bPrice = Number(item.budgetPrice) || 0;
                 const aPrice = Number(item.actualPrice) || 0;
-                const diffPrice = bPrice - aPrice;
+                const diffPrice = item.status === '待购' ? '-' : (bPrice - aPrice);
 
                 aoa.push([
                     item.name || '',
