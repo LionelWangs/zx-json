@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/16 16:57:49",
+  "exportTime": "2026/4/16 17:09:22",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -386,6 +386,22 @@
       "sortIndex": 23
     },
     {
+      "name": "马桶",
+      "category": "家电",
+      "brand": "箭牌",
+      "quantity": 2,
+      "budgetPrice": 4000,
+      "actualPrice": 0,
+      "purchaseChannel": "线下实体店",
+      "priority": "高",
+      "status": "待购",
+      "notes": "",
+      "color": "#ffffff",
+      "locked": false,
+      "id": 1776330554155.3564,
+      "sortIndex": 24
+    },
+    {
       "id": 1777000100007,
       "color": "#ffffff",
       "locked": false,
@@ -399,7 +415,7 @@
       "notes": "",
       "category": "家电",
       "priority": "中",
-      "sortIndex": 24
+      "sortIndex": 25
     },
     {
       "id": 1777000100005,
@@ -415,7 +431,7 @@
       "notes": "套装标价，N1单买约699+花洒约1499",
       "category": "家电",
       "priority": "中",
-      "sortIndex": 25
+      "sortIndex": 26
     },
     {
       "id": 1777000100003,
@@ -431,7 +447,7 @@
       "notes": "",
       "category": "家电",
       "priority": "中",
-      "sortIndex": 26
+      "sortIndex": 27
     },
     {
       "id": 1777000100004,
@@ -447,7 +463,7 @@
       "notes": "",
       "category": "家电",
       "priority": "中",
-      "sortIndex": 27
+      "sortIndex": 28
     },
     {
       "id": 1777000100009,
@@ -463,7 +479,7 @@
       "notes": "",
       "category": "家电",
       "priority": "低",
-      "sortIndex": 28
+      "sortIndex": 29
     },
     {
       "id": 1777000100001,
@@ -479,7 +495,7 @@
       "notes": "",
       "category": "家电",
       "priority": "低",
-      "sortIndex": 29
+      "sortIndex": 30
     },
     {
       "id": 1777000100013,
@@ -495,14 +511,14 @@
       "notes": "",
       "category": "家电",
       "priority": "低",
-      "sortIndex": 30
+      "sortIndex": 31
     }
   ],
   "statistics": {
-    "totalBudget": 264073,
+    "totalBudget": 268073,
     "totalActual": 146943,
-    "budgetDifference": 117130,
-    "totalQuantity": 136,
+    "budgetDifference": 121130,
+    "totalQuantity": 138,
     "completedCount": 6,
     "completionRate": 19
   }
