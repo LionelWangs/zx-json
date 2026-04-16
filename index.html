@@ -1433,8 +1433,8 @@
                 } catch(e) {}
             }
             
-            // 兼容历史数据，迁移状态名称，添加默认优先度
-            appliances.forEach(item => {
+            // 兼容历史数据，迁移状态名称，添加默认优先度和排序字段
+            appliances.forEach((item, index) => {
                 if (item.status === '已完成') {
                     item.status = '完成';
                 } else if (item.status === '已付款') {
@@ -1443,7 +1443,13 @@
                 if (!item.priority) {
                     item.priority = '中'; // 默认优先度
                 }
+                if (typeof item.sortIndex === 'undefined') {
+                    item.sortIndex = index; // 默认排序字段
+                }
             });
+            
+            // 确保初始数据按 sortIndex 排序
+            appliances.sort((a, b) => (a.sortIndex || 0) - (b.sortIndex || 0));
             
             // 初始化表头 UI 状态
             document.querySelectorAll('th.sortable').forEach(th => {
@@ -1701,6 +1707,9 @@
                     valB = String(valB || '');
                     return sortConfig.isDesc ? valB.localeCompare(valA) : valA.localeCompare(valB);
                 });
+            } else {
+                // 如果没有手动点击表头排序，则按 sortIndex 排序
+                filteredData.sort((a, b) => (a.sortIndex || 0) - (b.sortIndex || 0));
             }
 
             render();
@@ -1798,8 +1807,8 @@
                     tr.setAttribute('data-id', item.id);
                     if (isOverBudget) tr.classList.add('row-over-budget');
                     
-                    // 如果正在排序或筛选，隐藏拖拽手柄（避免破坏原数组顺序）
-                    const canDrag = currentFilter === 'all' && currentSearch === '' && sortConfig.key === null;
+                    // 如果正在点击表头排序，隐藏拖拽手柄（避免破坏原数组顺序）
+                    const canDrag = sortConfig.key === null;
                     const dragHtml = canDrag 
                         ? `<div class="drag-handle"><i class="ph ph-list"></i></div>` 
                         : `<div style="width:20px;"></div>`;
@@ -2108,6 +2117,15 @@
                 if (Array.isArray(parsedData)) {
                     if (confirm('确定要使用粘贴的 JSON 数据覆盖当前所有数据吗？此操作不可撤销。')) {
                         appliances = parsedData;
+                        
+                        // 确保有 sortIndex 且按 sortIndex 排序
+                        appliances.forEach((item, index) => {
+                            if (typeof item.sortIndex === 'undefined') {
+                                item.sortIndex = index;
+                            }
+                        });
+                        appliances.sort((a, b) => (a.sortIndex || 0) - (b.sortIndex || 0));
+                        
                         applyFiltersAndSort();
                         closeJsonModal();
                         alert('数据已成功覆盖！');
@@ -2185,6 +2203,7 @@
             } else {
                 // 新增
                 itemData.id = new Date().getTime() + Math.random();
+                itemData.sortIndex = appliances.length ? Math.max(...appliances.map(a => a.sortIndex || 0)) + 1 : 0;
                 appliances.push(itemData);
             }
 
@@ -2215,9 +2234,44 @@
                 ghostClass: 'sortable-ghost',
                 dragClass: 'sortable-drag',
                 onEnd: function (evt) {
-                    const item = appliances.splice(evt.oldIndex, 1)[0];
-                    appliances.splice(evt.newIndex, 0, item);
-                    saveToCache(); // 只保存缓存，不重绘DOM避免闪烁
+                    // 只有在非点击表头排序的情况下才处理拖拽结果
+                    if (sortConfig.key !== null) return;
+
+                    const draggedItemIndex = evt.oldIndex;
+                    const targetItemIndex = evt.newIndex;
+                    
+                    if (draggedItemIndex === targetItemIndex) return;
+
+                    // 获取当前表格展示的数据（filteredData）
+                    const draggedItem = filteredData[draggedItemIndex];
+                    const targetItem = filteredData[targetItemIndex];
+
+                    if (!draggedItem || !targetItem) return;
+
+                    // 获取它们在全局 appliances 数组中的真实索引位置
+                    const globalOldIndex = appliances.findIndex(a => a.id === draggedItem.id);
+                    const globalNewIndex = appliances.findIndex(a => a.id === targetItem.id);
+
+                    if (globalOldIndex > -1 && globalNewIndex > -1) {
+                        // 在全局数组中移动元素
+                        const item = appliances.splice(globalOldIndex, 1)[0];
+                        
+                        // 调整插入位置：
+                        // 如果是向下拖拽，应该插入到目标元素的后面
+                        // 如果是向上拖拽，应该插入到目标元素的前面
+                        const insertIndex = globalOldIndex < globalNewIndex ? globalNewIndex : globalNewIndex;
+                        appliances.splice(insertIndex, 0, item);
+
+                        // 重新分配 sortIndex 保持与物理顺序一致
+                        appliances.forEach((a, idx) => {
+                            a.sortIndex = idx;
+                        });
+
+                        saveToCache(); 
+                        
+                        // 重新应用过滤和渲染以确保 DOM 和数据完全一致
+                        applyFiltersAndSort();
+                    }
                 }
             });
         }
@@ -2533,7 +2587,16 @@
                     if (importedData.appliances && Array.isArray(importedData.appliances)) {
                         if (confirm('导入将覆盖当前所有数据，确认继续吗？')) {
                             appliances = importedData.appliances;
-                            render();
+                            
+                            // 导入后确保有 sortIndex 且按 sortIndex 排序
+                            appliances.forEach((item, index) => {
+                                if (typeof item.sortIndex === 'undefined') {
+                                    item.sortIndex = index;
+                                }
+                            });
+                            appliances.sort((a, b) => (a.sortIndex || 0) - (b.sortIndex || 0));
+                            
+                            applyFiltersAndSort();
                             alert('导入成功！');
                         }
                     } else {
