@@ -1079,7 +1079,7 @@
                 <button class="btn btn-ghost" onclick="pushToCloud()" title="推送到云端 (Push)">
                     <i class="ph ph-cloud-arrow-up" style="font-size: 16px;"></i> 推送
                 </button>
-                <button class="btn btn-ghost" onclick="openSettingsModal()" title="设置 GitHub 同步凭证">
+                <button class="btn btn-ghost" onclick="openSettingsModal()" title="设置 Gitee 同步凭证">
                     <i class="ph ph-gear" style="font-size: 16px;"></i> 设置
                 </button>
             </div>
@@ -1231,6 +1231,15 @@
                 <button class="btn btn-ghost" onclick="closeModal()"><i class="ph ph-x" style="font-size: 20px;"></i></button>
             </div>
             <div class="modal-body">
+
+                <div class="form-group full">
+                    <label>同步平台 (Platform)</label>
+                    <select class="form-control" id="setting-provider">
+                        <option value="gitee">Gitee (码云)</option>
+                        <option value="github">GitHub</option>
+                    </select>
+                </div>
+
                 <input type="hidden" id="form-id">
                 
                 <div class="form-group full">
@@ -1302,23 +1311,23 @@
         </div>
     </div>
 
-    <!-- 弹窗：GitHub 设置 -->
+    <!-- 弹窗：Gitee 设置 -->
     <div class="modal-overlay" id="settingsModalOverlay">
         <div class="modal">
             <div class="modal-header">
-                <h2><i class="ph ph-github-logo"></i> GitHub 同步设置</h2>
+                <h2><i class="ph ph-cloud-arrow-up"></i> 云端同步设置</h2>
                 <button class="btn btn-ghost" onclick="closeSettingsModal()"><i class="ph ph-x" style="font-size: 20px;"></i></button>
             </div>
             <div class="modal-body">
                 <div class="form-group full">
                     <label>Personal Access Token (必填)</label>
                     <input type="password" class="form-control" id="setting-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 4px;">用于授权修改你的 GitHub 仓库，仅保存在本地缓存中，不会上传。</p>
+                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 4px;">用于授权修改你的云端仓库，仅保存在本地缓存中，不会上传。</p>
                 </div>
                 
                 <div class="form-group full">
                     <label>仓库拥有者 (Owner)</label>
-                    <input type="text" class="form-control" id="setting-owner" placeholder="如：LionelWangs" value="LionelWangs">
+                    <input type="text" class="form-control" id="setting-owner" placeholder="如：lionel-wang" value="lionel-wang">
                 </div>
                 
                 <div class="form-group full">
@@ -1329,6 +1338,11 @@
                 <div class="form-group full">
                     <label>文件路径 (Path)</label>
                     <input type="text" class="form-control" id="setting-path" placeholder="如：装修预算.json" value="装修预算.json">
+                </div>
+                
+                <div class="form-group full">
+                    <label>分支名称 (Branch)</label>
+                    <input type="text" class="form-control" id="setting-branch" placeholder="如：gitee 或 main" value="gitee">
                 </div>
             </div>
             <div class="modal-footer">
@@ -1373,13 +1387,14 @@
         let hiddenColumns = new Set(); // 存储被隐藏的列 data-col 名字
         let columnWidths = {}; // 存储拖拽自定义的列宽
         
-        // GitHub 同步配置
-        let githubConfig = {
+        // 云端同步配置
+        let syncConfig = {
+            provider: 'gitee', // 'gitee' or 'github'
             token: '',
-            owner: 'LionelWangs',
+            owner: 'lionel-wang',
             repo: 'zx-json',
             path: '装修预算.json',
-            branch: 'main'
+            branch: 'gitee'
         };
         
         // 图表实例
@@ -1547,13 +1562,13 @@
                 } catch(e) {}
             }
             
-            // 恢复 GitHub 配置
-            const cachedGithub = localStorage.getItem(CACHE_KEY + '_github_config');
-            if (cachedGithub) {
+            // 恢复 Gitee 配置
+            const cachedSync = localStorage.getItem(CACHE_KEY + '_sync_config') || localStorage.getItem(CACHE_KEY + '_gitee_config') || localStorage.getItem(CACHE_KEY + '_github_config');
+            if (cachedSync) {
                 try {
-                    githubConfig = { ...githubConfig, ...JSON.parse(cachedGithub) };
-                } catch (e) {
-                    console.error('GitHub配置解析失败', e);
+                    syncConfig = { ...syncConfig, ...JSON.parse(cachedSync) };
+                } catch(e) {
+                    console.error('云端配置解析失败', e);
                 }
             }
             
@@ -2332,10 +2347,12 @@
         // 打开/关闭设置弹窗
         const settingsModal = document.getElementById('settingsModalOverlay');
         function openSettingsModal() {
-            document.getElementById('setting-token').value = githubConfig.token;
-            document.getElementById('setting-owner').value = githubConfig.owner;
-            document.getElementById('setting-repo').value = githubConfig.repo;
-            document.getElementById('setting-path').value = githubConfig.path;
+            document.getElementById('setting-provider').value = syncConfig.provider || 'gitee';
+            document.getElementById('setting-token').value = syncConfig.token;
+            document.getElementById('setting-owner').value = syncConfig.owner;
+            document.getElementById('setting-repo').value = syncConfig.repo;
+            document.getElementById('setting-path').value = syncConfig.path;
+            document.getElementById('setting-branch').value = syncConfig.branch || 'gitee';
             settingsModal.classList.add('active');
         }
         
@@ -2344,25 +2361,27 @@
         }
         
         function saveSettings() {
-            githubConfig.token = document.getElementById('setting-token').value.trim();
-            githubConfig.owner = document.getElementById('setting-owner').value.trim();
-            githubConfig.repo = document.getElementById('setting-repo').value.trim();
-            githubConfig.path = document.getElementById('setting-path').value.trim();
+            syncConfig.provider = document.getElementById('setting-provider').value;
+            syncConfig.token = document.getElementById('setting-token').value.trim();
+            syncConfig.owner = document.getElementById('setting-owner').value.trim();
+            syncConfig.repo = document.getElementById('setting-repo').value.trim();
+            syncConfig.path = document.getElementById('setting-path').value.trim();
+            syncConfig.branch = document.getElementById('setting-branch').value.trim() || 'gitee';
             
-            localStorage.setItem(CACHE_KEY + '_github_config', JSON.stringify(githubConfig));
+            localStorage.setItem(CACHE_KEY + '_sync_config', JSON.stringify(syncConfig));
             closeSettingsModal();
             alert('配置已保存到本地缓存');
         }
 
-        // 推送到 GitHub
+        // 推送到云端
         async function pushToCloud() {
-            if (!githubConfig.token) {
-                alert('请先点击"设置"配置你的 GitHub Personal Access Token！');
+            if (!syncConfig.token) {
+                alert('请先点击"设置"配置你的私人令牌(Token)！');
                 openSettingsModal();
                 return;
             }
 
-            if (!confirm('这将会把当前本地的所有数据覆盖到 GitHub 仓库中，是否继续？')) return;
+            if (!confirm('这将会把当前本地的所有数据覆盖到云端仓库中，是否继续？')) return;
 
             const btn = document.querySelector('button[onclick="pushToCloud()"]');
             const originalText = btn.innerHTML;
@@ -2372,9 +2391,7 @@
                 btn.style.opacity = '0.7';
                 btn.style.pointerEvents = 'none';
 
-                // 1. 构造需要推送的数据
                 const stats = calculateStatistics(appliances);
-
                 const exportData = {
                     exportTime: new Date().toLocaleString('zh-CN', { hour12: false }),
                     appliances: appliances,
@@ -2390,102 +2407,102 @@
                 };
 
                 const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(exportData, null, 2))));
-                const apiUrl = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${encodeURIComponent(githubConfig.path)}`;
+                const isGithub = syncConfig.provider === 'github';
+                
+                const apiUrl = isGithub
+                    ? `https://api.github.com/repos/${syncConfig.owner}/${syncConfig.repo}/contents/${encodeURIComponent(syncConfig.path)}`
+                    : `https://gitee.com/api/v5/repos/${syncConfig.owner}/${syncConfig.repo}/contents/${encodeURIComponent(syncConfig.path)}`;
 
-                // 2. 先获取当前主文件的 SHA (如果文件已存在)
+                // 2. 获取当前主文件的 SHA
                 let currentSha = null;
                 let oldContentBase64 = null;
                 try {
-                    // 添加时间戳防止 GitHub API 缓存导致拿到旧的 SHA
-                    const getRes = await fetch(`${apiUrl}?ref=${githubConfig.branch}&t=${new Date().getTime()}`, {
-                        headers: {
-                            'Authorization': `token ${githubConfig.token}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    });
+                    const getUrl = isGithub
+                        ? `${apiUrl}?ref=${syncConfig.branch}&t=${new Date().getTime()}`
+                        : `${apiUrl}?ref=${syncConfig.branch}&access_token=${syncConfig.token}&t=${new Date().getTime()}`;
+                    
+                    const headers = isGithub ? {
+                        'Authorization': `token ${syncConfig.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    } : {};
+
+                    const getRes = await fetch(getUrl, { headers });
                     if (getRes.ok) {
                         const fileData = await getRes.json();
                         currentSha = fileData.sha;
                         oldContentBase64 = fileData.content;
-                    } else {
-                        console.log('获取文件信息响应状态异常:', getRes.status);
                     }
                 } catch (e) {
-                    console.error('获取文件SHA失败，可能主文件是第一次创建或网络异常:', e);
+                    console.error('获取文件SHA失败', e);
                 }
                 
-                // 3. 只要旧文件存在，就备份一份到 history 目录（降低条件，确保触发）
+                // 3. 备份历史记录
                 if (currentSha && oldContentBase64) {
                     try {
                         const d = new Date();
-                        // 格式化为：YYYY-MM-DD_HH-mm-ss
                         const timeStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}_${String(d.getHours()).padStart(2, '0')}-${String(d.getMinutes()).padStart(2, '0')}-${String(d.getSeconds()).padStart(2, '0')}`;
                         
-                        // 提取原文件的路径（去掉文件名部分）
-                        const pathParts = githubConfig.path.split('/');
-                        pathParts.pop(); // 丢弃原文件名
-                        
-                        // 构造备份路径: history/原目录/2026-04-13_15-30-22.json
+                        const pathParts = syncConfig.path.split('/');
+                        pathParts.pop(); 
                         const backupDir = pathParts.length > 0 ? `history/${pathParts.join('/')}` : 'history';
                         const backupPath = `${backupDir}/${timeStr}.json`;
-                        const backupApiUrl = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${encodeURIComponent(backupPath)}`;
                         
-                        console.log(`正在备份旧数据到: ${backupPath}`);
+                        const backupApiUrl = isGithub
+                            ? `https://api.github.com/repos/${syncConfig.owner}/${syncConfig.repo}/contents/${encodeURIComponent(backupPath)}`
+                            : `https://gitee.com/api/v5/repos/${syncConfig.owner}/${syncConfig.repo}/contents/${encodeURIComponent(backupPath)}`;
                         
-                        const backupRes = await fetch(backupApiUrl, {
-                            method: 'PUT',
-                            headers: {
-                                'Authorization': `token ${githubConfig.token}`,
-                                'Accept': 'application/vnd.github.v3+json',
+                        const backupBody = {
+                            message: `Auto backup before update - ${timeStr}`,
+                            content: oldContentBase64,
+                            branch: syncConfig.branch
+                        };
+                        if (!isGithub) backupBody.access_token = syncConfig.token;
+
+                        await fetch(backupApiUrl, {
+                            method: isGithub ? 'PUT' : 'POST',
+                            headers: isGithub ? {
+                                'Authorization': `token ${syncConfig.token}`,
+                                'Content-Type': 'application/json'
+                            } : {
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({
-                                message: `Auto backup before update - ${timeStr}`,
-                                content: oldContentBase64,
-                                branch: githubConfig.branch
-                            })
+                            body: JSON.stringify(backupBody)
                         });
-                        
-                        if (backupRes.ok) {
-                            console.log(`✅ 历史备份成功: ${backupPath}`);
-                        } else {
-                            const errorMsg = await backupRes.text();
-                            console.error('❌ 备份请求失败:', errorMsg);
-                            alert(`备份文件创建失败，错误码：${backupRes.status}，详细信息请查看控制台。`);
-                        }
                     } catch (backupErr) {
-                        console.error('❌ 备份历史数据请求抛出异常', backupErr);
-                        alert('备份请求异常：' + backupErr.message);
+                        console.error('备份请求异常', backupErr);
                     }
                 }
 
-                // 4. 执行 PUT 更新或创建主文件
-                // 如果刚刚执行了备份（并且没有抛出致命异常），主文件的 sha 并没有变
+                // 4. 执行更新或创建
                 const bodyData = {
                     message: `Update budget via Web App - ${new Date().toLocaleString()}`,
                     content: contentBase64,
-                    branch: githubConfig.branch
+                    branch: syncConfig.branch
                 };
-                if (currentSha) {
-                    bodyData.sha = currentSha;
-                }
+                if (!isGithub) bodyData.access_token = syncConfig.token;
+                if (currentSha) bodyData.sha = currentSha;
+
+                const method = isGithub ? 'PUT' : (currentSha ? 'PUT' : 'POST');
+                const headers = isGithub ? {
+                    'Authorization': `token ${syncConfig.token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                } : {
+                    'Content-Type': 'application/json'
+                };
 
                 const putRes = await fetch(apiUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${githubConfig.token}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
+                    method: method,
+                    headers: headers,
                     body: JSON.stringify(bodyData)
                 });
 
                 if (!putRes.ok) {
                     const errorMsg = await putRes.text();
-                    throw new Error(`GitHub API Error: ${putRes.status} ${errorMsg}`);
+                    throw new Error(`Cloud API Error: ${putRes.status} ${errorMsg}`);
                 }
 
-                alert('🚀 成功推送到 GitHub 仓库！');
+                alert('🚀 成功推送到云端仓库！');
             } catch (err) {
                 console.error("推送失败", err);
                 alert(`推送失败，请检查 Token 权限、仓库名及路径是否正确。\n\n错误信息：${err.message}`);
@@ -2501,30 +2518,46 @@
                 return;
             }
 
-            // GitHub Raw 地址原生支持 CORS，不需要任何第三方代理服务！
-            const githubUrl = `https://raw.githubusercontent.com/${githubConfig.owner}/${githubConfig.repo}/refs/heads/${githubConfig.branch}/${encodeURIComponent(githubConfig.path)}`;
-            // 仅保留添加随机数防缓存
-            const cloudUrl = `${githubUrl}?t=${new Date().getTime()}`;
+            if (!syncConfig.token) {
+                alert('请先点击"设置"配置你的私人令牌(Token)！');
+                openSettingsModal();
+                return;
+            }
+
+            const isGithub = syncConfig.provider === 'github';
+            const apiUrl = isGithub
+                ? `https://api.github.com/repos/${syncConfig.owner}/${syncConfig.repo}/contents/${encodeURIComponent(syncConfig.path)}?ref=${syncConfig.branch}&t=${new Date().getTime()}`
+                : `https://gitee.com/api/v5/repos/${syncConfig.owner}/${syncConfig.repo}/contents/${encodeURIComponent(syncConfig.path)}?ref=${syncConfig.branch}&access_token=${syncConfig.token}&t=${new Date().getTime()}`;
             
+            const headers = isGithub ? {
+                'Authorization': `token ${syncConfig.token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            } : {};
+
             const btn = document.querySelector('button[onclick="syncFromCloud()"]');
             const originalText = btn.innerHTML;
             
             try {
-                // 按钮加载状态
                 btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> 同步中...';
                 btn.style.opacity = '0.7';
                 btn.style.pointerEvents = 'none';
 
-                const response = await fetch(cloudUrl);
+                const response = await fetch(apiUrl, { headers });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const importedData = await response.json();
+                const fileData = await response.json();
+                if (!fileData.content) {
+                    throw new Error('未找到文件内容，可能是路径错误或空文件。');
+                }
+
+                // Base64 解码 utf-8
+                const jsonStr = decodeURIComponent(escape(atob(fileData.content)));
+                const importedData = JSON.parse(jsonStr);
                 
                 if (importedData.appliances && Array.isArray(importedData.appliances)) {
-                    // --- 核心 Diff 对比算法 ---
                     let addedCount = 0;
                     let updatedCount = 0;
                     let deletedCount = 0;
@@ -2532,12 +2565,10 @@
                     const localDataMap = new Map(appliances.map(item => [item.id, item]));
                     const cloudDataMap = new Map(importedData.appliances.map(item => [item.id, item]));
                     
-                    // 1. 找新增和修改
                     importedData.appliances.forEach(cloudItem => {
                         if (!localDataMap.has(cloudItem.id)) {
                             addedCount++;
                         } else {
-                            // 深度对比对象是否发生变化（忽略可能存在的内存引用差异）
                             const localItemStr = JSON.stringify(localDataMap.get(cloudItem.id));
                             const cloudItemStr = JSON.stringify(cloudItem);
                             if (localItemStr !== cloudItemStr) {
@@ -2546,17 +2577,14 @@
                         }
                     });
                     
-                    // 2. 找删除
                     appliances.forEach(localItem => {
                         if (!cloudDataMap.has(localItem.id)) {
                             deletedCount++;
                         }
                     });
 
-                    // 覆盖本地数据
                     appliances = importedData.appliances;
                     
-                    // 重置筛选和搜索状态，展示云端全量数据
                     currentFilter = 'all';
                     currentSearch = '';
                     sortConfig = { key: null, isDesc: false };
@@ -2565,7 +2593,6 @@
                     
                     applyFiltersAndSort();
                     
-                    // 动态弹窗提示 Diff 结果
                     if (addedCount === 0 && updatedCount === 0 && deletedCount === 0) {
                         alert('🎉 云端同步成功！\n\n云端数据与本地完全一致，没有发生任何变更。');
                     } else {
@@ -2576,9 +2603,8 @@
                 }
             } catch (err) {
                 console.error("同步失败", err);
-                alert(`云端同步失败，请检查网络或文件地址是否正确。\n可能的原因：文件尚未上传、设为了私有，或者网络被拦截。\n\n错误信息：${err.message}`);
+                alert(`云端同步失败，请检查网络或文件地址是否正确。\n\n错误信息：${err.message}`);
             } finally {
-                // 恢复按钮状态
                 btn.innerHTML = originalText;
                 btn.style.opacity = '1';
                 btn.style.pointerEvents = 'auto';
