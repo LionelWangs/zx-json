@@ -1231,15 +1231,7 @@
                 <button class="btn btn-ghost" onclick="closeModal()"><i class="ph ph-x" style="font-size: 20px;"></i></button>
             </div>
             <div class="modal-body">
-
-                <div class="form-group full">
-                    <label>同步平台 (Platform)</label>
-                    <select class="form-control" id="setting-provider">
-                        <option value="gitee">Gitee (码云)</option>
-                        <option value="github">GitHub</option>
-                    </select>
-                </div>
-
+                
                 <input type="hidden" id="form-id">
                 
                 <div class="form-group full">
@@ -1311,7 +1303,7 @@
         </div>
     </div>
 
-    <!-- 弹窗：Gitee 设置 -->
+    <!-- 弹窗：云端设置 -->
     <div class="modal-overlay" id="settingsModalOverlay">
         <div class="modal">
             <div class="modal-header">
@@ -1319,6 +1311,13 @@
                 <button class="btn btn-ghost" onclick="closeSettingsModal()"><i class="ph ph-x" style="font-size: 20px;"></i></button>
             </div>
             <div class="modal-body">
+                <div class="form-group full">
+                    <label>同步平台 (Platform)</label>
+                    <select class="form-control" id="setting-provider">
+                        <option value="gitee">Gitee (码云)</option>
+                        <option value="github">GitHub</option>
+                    </select>
+                </div>
                 <div class="form-group full">
                     <label>Personal Access Token (必填)</label>
                     <input type="password" class="form-control" id="setting-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
