@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/17 09:44:15",
+  "exportTime": "2026/4/17 10:02:53",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -170,7 +170,7 @@
       "actualPrice": 670,
       "purchaseChannel": "淘宝",
       "priority": "高",
-      "status": "待购",
+      "status": "付款",
       "notes": "咸鱼感觉不靠谱 换成了淘宝",
       "color": "#ffffff",
       "locked": false,
@@ -516,8 +516,8 @@
   ],
   "statistics": {
     "totalBudget": 268073,
-    "totalActual": 146303,
-    "budgetDifference": 121770,
+    "totalActual": 146973,
+    "budgetDifference": 121100,
     "totalQuantity": 138,
     "completedCount": 6,
     "completionRate": 19,
@@ -538,7 +538,7 @@
       },
       "硬装": {
         "totalBudget": 156101,
-        "totalActual": 96820,
+        "totalActual": 97490,
         "completedCount": 3,
         "totalQuantity": 90,
         "itemCount": 11
