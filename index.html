@@ -82,9 +82,11 @@
 
         /* 顶部毛玻璃导航 (Apple Navbar) */
         header {
-            position: sticky;
+            position: fixed; /* 改为 fixed 定位，使其彻底脱离文档流，永远固定在顶部 */
             top: 0;
-            z-index: 100;
+            left: 0;
+            right: 0;
+            z-index: 2000; /* 提高 z-index 确保永远在最上层 */
             background: var(--glass-bg);
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
@@ -201,6 +203,7 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 32px 20px;
+            padding-top: 100px; /* 因为 header 改为 fixed 脱离了文档流，增加顶部内边距避免内容被遮挡 */
             gap: 32px;
             animation: fadeUpIn 0.8s var(--ease-out) forwards;
             align-items: flex-start;
@@ -711,7 +714,8 @@
             z-index: 1000;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* 改为靠上对齐 */
+            padding-top: 120px; /* 操作栏高度加100px */
             opacity: 0;
             visibility: hidden;
             transition: all 0.4s var(--ease-out);
@@ -728,12 +732,13 @@
             width: 100%;
             max-width: 540px;
             box-shadow: var(--shadow-float);
-            transform: translateY(40px) scale(0.95);
+            transform: translateY(-20px) scale(0.95); /* 从上方滑下 */
             transition: all 0.5s var(--ease-spring);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            max-height: 90vh;
+            min-height: 520px; /* 统一各类弹窗最低高度，保证视觉一致性 */
+            max-height: calc(100vh - 120px); /* 防止底部被截断 */
             border: 1px solid rgba(255,255,255,0.15);
         }
 
@@ -1353,16 +1358,14 @@
 
     <!-- 弹窗：JSON 数据 -->
     <div class="modal-overlay" id="jsonModalOverlay">
-        <div class="modal" style="max-width: 800px;">
+        <div class="modal" style="max-width: 800px; min-height: 520px;">
             <div class="modal-header">
                 <h2><i class="ph ph-code"></i> JSON 数据</h2>
                 <button class="btn btn-ghost" onclick="closeJsonModal()"><i class="ph ph-x" style="font-size: 20px;"></i></button>
             </div>
-            <div class="modal-body" style="grid-template-columns: 1fr;">
-                <div class="form-group full">
-                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">你可以查看、复制当前的 JSON 数据，或者在此处粘贴新的 JSON 数据并保存以覆盖当前页面数据。</p>
-                    <textarea class="form-control" id="json-textarea" rows="20" style="font-family: monospace; font-size: 13px; resize: vertical;"></textarea>
-                </div>
+            <div class="modal-body" style="grid-template-columns: 1fr; display: flex; flex-direction: column;">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">你可以查看、复制当前的 JSON 数据，或者在此处粘贴新的 JSON 数据并保存以覆盖当前页面数据。</p>
+                <textarea class="form-control" id="json-textarea" style="flex: 1; font-family: monospace; font-size: 13px; resize: none; min-height: 300px;"></textarea>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="copyJsonData()">复制到剪贴板</button>
