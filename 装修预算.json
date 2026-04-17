@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/17 08:00:42",
+  "exportTime": "2026/4/17 14:11:09",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -520,6 +520,29 @@
     "budgetDifference": 121770,
     "totalQuantity": 138,
     "completedCount": 6,
-    "completionRate": 19
+    "completionRate": 19,
+    "categoryStats": {
+      "必要支出": {
+        "totalBudget": 16794,
+        "totalActual": 16794,
+        "completedCount": 2,
+        "totalQuantity": 2,
+        "itemCount": 2
+      },
+      "家电": {
+        "totalBudget": 95178,
+        "totalActual": 32689,
+        "completedCount": 1,
+        "totalQuantity": 46,
+        "itemCount": 19
+      },
+      "硬装": {
+        "totalBudget": 156101,
+        "totalActual": 96820,
+        "completedCount": 3,
+        "totalQuantity": 90,
+        "itemCount": 11
+      }
+    }
   }
 }
