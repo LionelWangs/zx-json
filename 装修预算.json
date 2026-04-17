@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/17 09:43:30",
+  "exportTime": "2026/4/17 09:44:15",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -167,11 +167,11 @@
       "brand": "领普",
       "quantity": 12,
       "budgetPrice": 1000,
-      "actualPrice": 640,
-      "purchaseChannel": "咸鱼",
+      "actualPrice": 670,
+      "purchaseChannel": "淘宝",
       "priority": "高",
       "status": "待购",
-      "notes": "",
+      "notes": "咸鱼感觉不靠谱 换成了淘宝",
       "color": "#ffffff",
       "locked": false,
       "id": 1776319709062.6135,
