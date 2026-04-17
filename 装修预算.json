@@ -1,5 +1,5 @@
 {
-  "exportTime": "2026/4/16 17:09:22",
+  "exportTime": "2026/4/17 08:00:42",
   "appliances": [
     {
       "id": 1766975524566.8728,
@@ -170,7 +170,7 @@
       "actualPrice": 640,
       "purchaseChannel": "咸鱼",
       "priority": "高",
-      "status": "付款",
+      "status": "待购",
       "notes": "",
       "color": "#ffffff",
       "locked": false,
@@ -516,8 +516,8 @@
   ],
   "statistics": {
     "totalBudget": 268073,
-    "totalActual": 146943,
-    "budgetDifference": 121130,
+    "totalActual": 146303,
+    "budgetDifference": 121770,
     "totalQuantity": 138,
     "completedCount": 6,
     "completionRate": 19
