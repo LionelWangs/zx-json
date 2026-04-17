@@ -1413,6 +1413,71 @@
             localStorage.setItem(CACHE_KEY + '_current_tab', tab);
         }
 
+        // 统一统计口径：
+        // 1) 总预算：统计所有状态
+        // 2) 实际支出：仅统计“完成/付款(兼容已付款)”
+        // 3) 支持按分类汇总
+        function calculateStatistics(items) {
+            const stats = {
+                totalBudget: 0,
+                totalActual: 0,
+                completedCount: 0,
+                totalQuantity: 0,
+                statusCount: { '待购': 0, '付款': 0, '完成': 0 },
+                categoryStats: {}
+            };
+
+            items.forEach(item => {
+                const category = item.category || '未分类';
+                const budgetPrice = Number(item.budgetPrice) || 0;
+                const actualPrice = Number(item.actualPrice) || 0;
+                const quantity = Number(item.quantity) || 1;
+                const status = item.status || '待购';
+                const isActualCounted = status === '完成' || status === '付款' || status === '已付款';
+                const isCompleted = status === '完成' || status === '已完成';
+
+                stats.totalBudget += budgetPrice;
+                if (isActualCounted) {
+                    stats.totalActual += actualPrice;
+                }
+                if (isCompleted) {
+                    stats.completedCount++;
+                }
+                stats.totalQuantity += quantity;
+
+                if (status === '已付款') {
+                    stats.statusCount['付款'] += 1;
+                } else if (status === '已完成') {
+                    stats.statusCount['完成'] += 1;
+                } else {
+                    stats.statusCount[status] = (stats.statusCount[status] || 0) + 1;
+                }
+
+                if (!stats.categoryStats[category]) {
+                    stats.categoryStats[category] = {
+                        totalBudget: 0,
+                        totalActual: 0,
+                        completedCount: 0,
+                        totalQuantity: 0,
+                        itemCount: 0
+                    };
+                }
+
+                const categoryItem = stats.categoryStats[category];
+                categoryItem.totalBudget += budgetPrice;
+                if (isActualCounted) {
+                    categoryItem.totalActual += actualPrice;
+                }
+                if (isCompleted) {
+                    categoryItem.completedCount += 1;
+                }
+                categoryItem.totalQuantity += quantity;
+                categoryItem.itemCount += 1;
+            });
+
+            return stats;
+        }
+
         function init() {
             const cached = localStorage.getItem(CACHE_KEY);
             if (cached) {
@@ -1721,29 +1786,16 @@
             const emptyState = document.getElementById('empty-state');
             tbody.innerHTML = '';
 
-            let totalBudget = 0;
-            let totalActual = 0;
-            let completedCount = 0;
+            const stats = calculateStatistics(filteredData);
+            const totalBudget = stats.totalBudget;
+            const totalActual = stats.totalActual;
+            const completedCount = stats.completedCount;
             
             // 图表数据收集
             let chartLabels = [];
             let chartBudgets = [];
             let chartActuals = [];
-            let statusCount = { '待购': 0, '付款': 0, '完成': 0 };
-
-            // 统计基于筛选后的数据计算
-            filteredData.forEach(item => {
-                // 排除“待购”状态的项计算实际支出和预算差额
-                if (item.status !== '待购') {
-                    totalBudget += Number(item.budgetPrice) || 0;
-                    totalActual += Number(item.actualPrice) || 0;
-                }
-                if (item.status === '完成') completedCount++;
-                
-                if (item.status) {
-                    statusCount[item.status] = (statusCount[item.status] || 0) + 1;
-                }
-            });
+            const statusCount = stats.statusCount;
 
             if (filteredData.length === 0) {
                 emptyState.style.display = 'block';
@@ -2321,25 +2373,19 @@
                 btn.style.pointerEvents = 'none';
 
                 // 1. 构造需要推送的数据
-                let totalBudget = 0, totalActual = 0, completedCount = 0;
-                appliances.forEach(item => {
-                    totalBudget += Number(item.budgetPrice) || 0;
-                    if (item.status !== '待购') {
-                        totalActual += Number(item.actualPrice) || 0;
-                    }
-                    if (item.status === '完成') completedCount++;
-                });
+                const stats = calculateStatistics(appliances);
 
                 const exportData = {
                     exportTime: new Date().toLocaleString('zh-CN', { hour12: false }),
                     appliances: appliances,
                     statistics: {
-                        totalBudget,
-                        totalActual,
-                        budgetDifference: totalBudget - totalActual,
-                        totalQuantity: appliances.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0),
-                        completedCount,
-                        completionRate: appliances.length > 0 ? Math.round((completedCount / appliances.length) * 100) : 0
+                        totalBudget: stats.totalBudget,
+                        totalActual: stats.totalActual,
+                        budgetDifference: stats.totalBudget - stats.totalActual,
+                        totalQuantity: stats.totalQuantity,
+                        completedCount: stats.completedCount,
+                        completionRate: appliances.length > 0 ? Math.round((stats.completedCount / appliances.length) * 100) : 0,
+                        categoryStats: stats.categoryStats
                     }
                 };
 
@@ -2540,25 +2586,19 @@
         }
 
         function exportJSON() {
-            let totalBudget = 0, totalActual = 0, completedCount = 0;
-            appliances.forEach(item => {
-                totalBudget += Number(item.budgetPrice) || 0;
-                if (item.status !== '待购') {
-                    totalActual += Number(item.actualPrice) || 0;
-                }
-                if (item.status === '完成') completedCount++;
-            });
+            const stats = calculateStatistics(appliances);
 
             const exportData = {
                 exportTime: new Date().toLocaleString('zh-CN', { hour12: false }),
                 appliances: appliances,
                 statistics: {
-                    totalBudget,
-                    totalActual,
-                    budgetDifference: totalBudget - totalActual,
-                    totalQuantity: appliances.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0),
-                    completedCount,
-                    completionRate: appliances.length > 0 ? Math.round((completedCount / appliances.length) * 100) : 0
+                    totalBudget: stats.totalBudget,
+                    totalActual: stats.totalActual,
+                    budgetDifference: stats.totalBudget - stats.totalActual,
+                    totalQuantity: stats.totalQuantity,
+                    completedCount: stats.completedCount,
+                    completionRate: appliances.length > 0 ? Math.round((stats.completedCount / appliances.length) * 100) : 0,
+                    categoryStats: stats.categoryStats
                 }
             };
 
