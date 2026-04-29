@@ -711,7 +711,7 @@
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            z-index: 1000;
+            z-index: 3000; /* 高于 header 的 2000，确保弹窗完全覆盖操作栏 */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -1049,17 +1049,32 @@
             }
 
             /* 弹窗适配 */
+            .modal-overlay {
+                align-items: flex-start;
+                padding-top: 0;
+            }
             .modal {
-                width: 95%;
-                max-height: 90vh;
-                margin: 0 auto;
+                width: 100%;
+                max-width: 100%;
+                min-height: 100vh;
+                min-height: 100dvh;
+                max-height: 100vh;
+                max-height: 100dvh;
+                border-radius: 0;
+                margin: 0;
+                border: none;
+                transform: translateY(0) scale(1);
+            }
+            .modal-overlay.active .modal {
+                transform: translateY(0) scale(1);
             }
             .modal-header, .modal-body, .modal-footer {
                 padding: 16px;
             }
             .modal-body {
-                grid-template-columns: 1fr; /* 单列显示表单 */
+                grid-template-columns: 1fr;
                 gap: 12px;
+                flex: 1;
             }
             .form-group.full {
                 grid-column: span 1;
@@ -2163,6 +2178,7 @@
 
         // --- JSON 数据查看与覆盖 ---
         function openJsonModal() {
+            document.body.classList.add('modal-open');
             const jsonStr = JSON.stringify(appliances, null, 4);
             document.getElementById('json-textarea').value = jsonStr;
             document.getElementById('jsonModalOverlay').classList.add('active');
@@ -2170,6 +2186,9 @@
 
         function closeJsonModal() {
             document.getElementById('jsonModalOverlay').classList.remove('active');
+            if (!document.querySelector('.modal-overlay.active')) {
+                document.body.classList.remove('modal-open');
+            }
         }
 
         function copyJsonData() {
@@ -2211,6 +2230,7 @@
         const modal = document.getElementById('modalOverlay');
 
         function openModal(id = null) {
+            document.body.classList.add('modal-open');
             document.getElementById('modalTitle').innerText = id ? '编辑项目' : '新增项目';
             if (id) {
                 const item = appliances.find(a => a.id === id);
