@@ -793,6 +793,13 @@
             box-shadow: var(--shadow-md);
         }
 
+        /* 表格基础样式 — 合并边框消除缝隙 */
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+        }
+
         /* 表头添加玻璃流光 */
         th {
             background: rgba(44, 44, 46, 0.5);
@@ -1612,6 +1619,224 @@
             from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* ===== V4 灵动增强 ===== */
+
+        /* --- 1. 涟漪点击反馈 --- */
+        @keyframes rippleAnim {
+            to { transform: scale(4); opacity: 0; }
+        }
+        .ripple-container {
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.35);
+            transform: scale(0);
+            animation: rippleAnim 0.6s ease-out forwards;
+            pointer-events: none;
+        }
+        .btn-primary .ripple { background: rgba(255,255,255,0.45); }
+        .btn-danger .ripple { background: rgba(255,69,58,0.4); }
+        .btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- 2. Toast 通知 --- */
+        #toast-container {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast {
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            background: rgba(40,40,42,0.92);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.06);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            min-width: 280px;
+            max-width: 420px;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .toast.hide {
+            transform: translateX(120%);
+            opacity: 0;
+        }
+        .toast::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 0 2px 2px 0;
+        }
+        .toast.success::before { background: var(--accent-green); }
+        .toast.error::before { background: var(--accent-red); }
+        .toast.info::before { background: var(--accent-blue); }
+        .toast i { font-size: 20px; }
+        .toast.success i { color: var(--accent-green); }
+        .toast.error i { color: var(--accent-red); }
+        .toast.info i { color: var(--accent-blue); }
+
+        /* --- 3. 行离开动画 --- */
+        @keyframes rowLeave {
+            from { opacity: 1; transform: scale(1); max-height: 60px; }
+            to { opacity: 0; transform: scale(0.95); max-height: 0; padding: 0; }
+        }
+        tr.row-leave {
+            animation: rowLeave 0.35s var(--ease-out) forwards;
+            overflow: hidden;
+        }
+        tr.row-leave td {
+            padding: 0 !important;
+            border: none !important;
+        }
+
+        /* --- 4. 空状态增强 --- */
+        @keyframes emptyFloat {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
+            50% { transform: translateY(-12px) scale(1.05); opacity: 0.8; }
+        }
+        .empty-state i {
+            animation: emptyFloat 3.5s ease-in-out infinite !important;
+        }
+        @keyframes shakeNoResult {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        .search-input.no-result {
+            animation: shakeNoResult 0.5s ease;
+            border-color: rgba(255,69,58,0.3);
+        }
+
+        /* --- 5. 背景深度增强 --- */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+            filter: blur(100px);
+            animation: liquidFloat 20s ease-in-out infinite alternate;
+        }
+
+        /* --- 6. 按钮微交互升级 --- */
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(10,132,255,0.45), 0 0 40px rgba(10,132,255,0.15), inset 0 1px 0 rgba(255,255,255,0.25);
+        }
+        .btn-outline:hover {
+            background-color: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.25);
+            box-shadow: var(--shadow-sm), 0 0 20px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        .btn-ghost:hover i {
+            transform: scale(1.2) rotate(-5deg);
+            transition: transform 0.35s var(--ease-spring);
+        }
+        .header-actions-group .btn-ghost:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        /* --- 7. 数字弹跳动效 --- */
+        @keyframes valuePop {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.08); }
+            70% { transform: scale(0.97); }
+            100% { transform: scale(1); }
+        }
+        .stat-card .value.value-pop {
+            animation: valuePop 0.4s var(--ease-spring);
+        }
+
+        /* --- 8. 模态框动效增强 --- */
+        .modal-overlay {
+            transition: opacity 0.5s var(--ease-out), visibility 0.5s var(--ease-out), backdrop-filter 0.6s ease;
+        }
+        .modal-overlay:not(.active) {
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+        }
+        .modal-overlay.active {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .modal {
+            transform-origin: center bottom;
+            transition: all 0.6s var(--ease-spring);
+        }
+        .modal-overlay:not(.active) .modal {
+            transform: translateY(40px) scale(0.92);
+            opacity: 0.5;
+        }
+
+        /* --- 9. 筛选按钮增强 --- */
+        .filter-btn {
+            transition: all 0.35s var(--ease-spring);
+        }
+        .filter-btn.active {
+            transform: scale(1.04);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.35), 0 0 16px rgba(255,255,255,0.04);
+        }
+        .filter-btn:not(.active):hover {
+            transform: scale(1.03);
+            background: rgba(255,255,255,0.08);
+        }
+
+        /* --- 10. 图表卡片入场 --- */
+        .chart-card {
+            animation: cardFadeIn 0.7s var(--ease-out) backwards;
+        }
+        .chart-card:nth-child(1) { animation-delay: 0.1s; }
+        .chart-card:nth-child(2) { animation-delay: 0.25s; }
+        .chart-card:hover {
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: var(--shadow-card-hover), 0 0 40px rgba(10,132,255,0.08);
+            transition: all 0.5s var(--ease-out);
+        }
+
+        /* --- 移动端禁用增强动效 --- */
+        @media (hover: none) and (max-width: 768px) {
+            .btn:hover { transform: none !important; }
+            .filter-btn.active { transform: none; }
+            .filter-btn:not(.active):hover { transform: none; }
+            .chart-card:hover { transform: none; }
+            .toast { min-width: 200px; max-width: 300px; }
+        }
     </style>
 </head>
 <body>
@@ -2129,6 +2354,9 @@
             
             // 初始化列宽拖拽
             initResizableColumns();
+
+            // 涟漪点击反馈
+            initRipple();
         }
 
         // --- 列宽拖拽功能 ---
@@ -2683,32 +2911,92 @@
             });
         }
 
-        // 数字增长动画
+        // 数字增长动画（增强版：弹性回弹 + 数字 pop 动效）
         function animateValue(obj, end, isDiff = false) {
-            const duration = 600;
+            const duration = 700;
             const start = Number(obj.innerText.replace(/[^0-9.-]+/g,"")) || 0;
             if (start === end) return;
-            
+
             const range = end - start;
-            let current = start;
-            const increment = end > start ? 1 : -1;
-            const stepTime = Math.abs(Math.floor(duration / range));
-            
             let startTime = null;
+
+            // 触发数字弹跳动效
+            obj.classList.remove('value-pop');
+            void obj.offsetWidth; // reflow
+            obj.classList.add('value-pop');
+
             const step = (timestamp) => {
                 if (!startTime) startTime = timestamp;
                 const progress = Math.min((timestamp - startTime) / duration, 1);
-                // Ease out cubic
-                const easeProgress = 1 - Math.pow(1 - progress, 3);
-                
+                // Ease out back: 略微超过终点再回弹，增强弹性感
+                const c1 = 1.70158;
+                const c3 = c1 + 1;
+                const easeProgress = 1 + c3 * Math.pow(progress - 1, 3) + c1 * Math.pow(progress - 1, 2);
+
                 let currentVal = Math.floor(start + (range * easeProgress));
                 if (progress === 1) currentVal = end;
-                
+
                 obj.innerText = (isDiff && currentVal > 0 ? '+' : '') + currentVal.toLocaleString();
-                
+
                 if (progress < 1) window.requestAnimationFrame(step);
             };
             window.requestAnimationFrame(step);
+        }
+
+        // Toast 通知
+        function showToast(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const icons = { success: 'ph-check-circle', error: 'ph-warning-circle', info: 'ph-info' };
+            const icon = icons[type] || icons.info;
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="ph ${icon}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+
+            // 触发入场动画
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            // 自动移除
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => {
+                    if (toast.parentNode) toast.parentNode.removeChild(toast);
+                }, 400);
+            }, duration);
+        }
+
+        // 涟漪点击反馈
+        function initRipple() {
+            document.querySelectorAll('.btn').forEach(btn => {
+                // 跳过已有 ripper-container 的按钮
+                if (btn.querySelector('.ripple-container')) return;
+
+                const container = document.createElement('span');
+                container.className = 'ripple-container';
+                btn.appendChild(container);
+
+                btn.addEventListener('mousedown', function(e) {
+                    const rect = btn.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    const ripple = document.createElement('span');
+                    ripple.className = 'ripple';
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+
+                    container.appendChild(ripple);
+                    ripple.addEventListener('animationend', () => {
+                        ripple.remove();
+                    });
+                });
+            });
         }
 
         // --- JSON 数据查看与覆盖 ---
@@ -2730,7 +3018,7 @@
             const textarea = document.getElementById('json-textarea');
             textarea.select();
             document.execCommand('copy');
-            alert('已复制到剪贴板！');
+            showToast('已复制到剪贴板', 'success');
         }
 
         function saveJsonData() {
@@ -2751,13 +3039,13 @@
                         
                         applyFiltersAndSort();
                         closeJsonModal();
-                        alert('数据已成功覆盖！');
+                        showToast('数据已成功覆盖', 'success');
                     }
                 } else {
-                    alert('无效的 JSON 格式：必须是一个数组。');
+                    showToast('无效的 JSON 格式：必须是一个数组', 'error');
                 }
             } catch (e) {
-                alert('JSON 解析失败，请检查格式是否正确：\n' + e.message);
+                showToast('JSON 解析失败：' + e.message, 'error', 5000);
             }
         }
 
@@ -2801,7 +3089,7 @@
         function saveData() {
             const id = document.getElementById('form-id').value;
             const name = document.getElementById('form-name').value.trim();
-            if (!name) return alert('名称不能为空！');
+            if (!name) return showToast('名称不能为空', 'error');
 
             const itemData = {
                 name: name,
@@ -2841,10 +3129,23 @@
         }
 
         function deleteData(id) {
-            if (confirm('确定要删除该项目吗？此操作不可恢复。')) {
+            if (!confirm('确定要删除该项目吗？此操作不可恢复。')) return;
+
+            // 尝试找到对应行，添加离开动画
+            const tbody = document.getElementById('table-body');
+            const row = tbody.querySelector(`tr[data-id="${id}"]`);
+            if (row) {
+                row.classList.add('row-leave');
+                // 等待离开动画完成后删除数据并重新渲染
+                setTimeout(() => {
+                    appliances = appliances.filter(a => a.id !== id);
+                    applyFiltersAndSort();
+                    showToast('项目已删除', 'error');
+                }, 320);
+            } else {
                 appliances = appliances.filter(a => a.id !== id);
-                // 删除后也需要重新走过滤和排序
                 applyFiltersAndSort();
+                showToast('项目已删除', 'error');
             }
         }
 
@@ -2927,13 +3228,13 @@
             
             localStorage.setItem(CACHE_KEY + '_sync_config', JSON.stringify(syncConfig));
             closeSettingsModal();
-            alert('配置已保存到本地缓存');
+            showToast('配置已保存到本地缓存', 'success');
         }
 
         // 推送到云端
         async function pushToCloud() {
             if (!syncConfig.token) {
-                alert('请先点击"设置"配置你的私人令牌(Token)！');
+                showToast('请先配置私人令牌(Token)', 'error');
                 openSettingsModal();
                 return;
             }
@@ -3076,7 +3377,7 @@
             }
 
             if (!syncConfig.token) {
-                alert('请先点击"设置"配置你的私人令牌(Token)！');
+                showToast('请先配置私人令牌(Token)', 'error');
                 openSettingsModal();
                 return;
             }
@@ -3511,5 +3812,11 @@
         // --- 初始化启动 ---
         window.onload = init;
     </script>
+
+    <!-- Toast 通知容器 -->
+    <div id="toast-container"></div>
+
+    <!-- 背景装饰光晕 3（动态补充 body::before/after 之外的第三个色调） -->
+    <div class="bg-orb" style="width:350px;height:350px;background:radial-gradient(circle,rgba(48,209,88,0.08) 0%,transparent 70%);top:40%;right:15%;animation-duration:22s;animation-delay:-8s;"></div>
 </body>
 </html>
