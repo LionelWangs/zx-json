@@ -4,6 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>装修预算与采购看板 V3.0</title>
+    <!-- 本地像素字体 -->
+    <style>
+        @font-face {
+            font-family: 'Zpix';
+            src: url('fonts/Zpix.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Press Start 2P';
+            src: url('fonts/PressStart2P.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'VT323';
+            src: url('fonts/VT323.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Share Tech Mono';
+            src: url('fonts/ShareTechMono.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+    </style>
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- SortableJS -->
@@ -12,62 +43,66 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <!-- GSAP -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
     <style>
         /* ============================================================
-           V3.0 DESIGN SYSTEM — Tinted Dark · Bento Grid · Glass 2.0
+           V5.0 CYBERPUNK 2077 DESIGN SYSTEM — Yellow · Cyan · Glitch
            ============================================================ */
         :root {
-            /* ---- Tinted Dark Palette ---- */
-            --bg-deep: #08090D;
-            --bg-base: #0C0E13;
-            --bg-surface: #111318;
-            --bg-elevated: #161920;
-            --bg-overlay: #1C1F28;
+            /* ---- Background Palette (Cyberpunk 2077 Dark) ---- */
+            --bg-deep: #0A0A0F;
+            --bg-base: #0D0D14;
+            --bg-surface: #12121A;
+            --bg-elevated: #1A1A25;
+            --bg-overlay: #1E1E2A;
 
-            /* ---- Text Hierarchy ---- */
-            --text-primary: #F5F5F7;
-            --text-secondary: #98989E;
-            --text-tertiary: #6E6E75;
-            --text-quaternary: #48484E;
+            /* ---- Text Hierarchy (Cyberpunk 2077) ---- */
+            --text-primary: #F0F0F0;
+            --text-secondary: #D0D0D0;
+            --text-tertiary: #8A8A8A;
+            --text-quaternary: #5A5A5A;
 
-            /* ---- Accent Colors ---- */
-            --accent-blue: #0A84FF;
-            --accent-blue-soft: #409CFF;
-            --accent-green: #30D158;
-            --accent-orange: #FF9F0A;
-            --accent-red: #FF453A;
-            --accent-purple: #BF5AF2;
-            --accent-teal: #00BFB3;
+            /* ---- Cyberpunk 2077 Accent Colors ---- */
+            --accent-purple: #FCEE09;        /* 主色：黄色 */
+            --accent-purple-light: #FFE44D;
+            --accent-purple-dark: #D4C500;
+            --accent-blue: #00F0FF;          /* 辅色：青色 */
+            --accent-green: #00FF88;
+            --accent-green-light: #40FFB0;
+            --accent-yellow: #FCEE09;        /* 黄色 */
+            --accent-orange: #FF6B00;
+            --accent-pink: #FF0055;          /* 红粉色 */
+            --accent-red: #FF0040;
 
-            /* ---- Glass 2.0 Tokens (refined, less blur) ---- */
-            --glass-blur: blur(20px) saturate(180%);
-            --glass-blur-light: blur(12px) saturate(160%);
-            --glass-bg: rgba(17, 19, 24, 0.55);
-            --glass-bg-hover: rgba(28, 31, 40, 0.65);
-            --glass-bg-active: rgba(34, 37, 46, 0.72);
-            --glass-border: rgba(255, 255, 255, 0.06);
-            --glass-border-hover: rgba(255, 255, 255, 0.10);
-            --glass-highlight: inset 0 0.5px 0 rgba(255, 255, 255, 0.07);
+            /* ---- Card Tokens (Cyberpunk 2077 Glass) ---- */
+            --card-bg: rgba(18, 18, 26, 0.85);
+            --card-border: rgba(252, 238, 9, 0.3);
+            --card-border-hover: rgba(252, 238, 9, 0.6);
+            --input-bg: rgba(18, 18, 26, 0.9);
+            --input-border: rgba(252, 238, 9, 0.4);
 
-            /* ---- Shadows (deeper, more atmospheric) ---- */
-            --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.45);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.5);
-            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(255, 255, 255, 0.04);
-            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
-            --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.7);
-            --shadow-float: 0 32px 80px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.05);
-            --shadow-glow-blue: 0 0 30px rgba(10, 132, 255, 0.12);
-            --shadow-glow-green: 0 0 30px rgba(48, 209, 88, 0.10);
-            --shadow-glow-orange: 0 0 30px rgba(255, 159, 10, 0.10);
+            /* ---- Neon Glows (Cyberpunk 2077) ---- */
+            --glow-purple: 0 0 10px rgba(252, 238, 9, 0.5), 0 0 20px rgba(252, 238, 9, 0.3);
+            --glow-purple-intense: 0 0 15px rgba(252, 238, 9, 0.7), 0 0 30px rgba(252, 238, 9, 0.4), 0 0 45px rgba(252, 238, 9, 0.2);
+            --glow-blue: 0 0 10px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.3);
+            --glow-pink: 0 0 10px rgba(255, 0, 85, 0.5), 0 0 20px rgba(255, 0, 85, 0.3);
 
-            /* ---- Radius ---- */
-            --radius-2xl: 28px;
-            --radius-xl: 20px;
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --radius-xs: 6px;
+            /* ---- Shadows (Cyberpunk 2077) ---- */
+            --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.8);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 4px rgba(252, 238, 9, 0.1);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.8), 0 0 8px rgba(252, 238, 9, 0.15);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 12px rgba(252, 238, 9, 0.2);
+            --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 20px rgba(252, 238, 9, 0.25);
+
+            /* ---- Radius (Cyberpunk Sharp) ---- */
+            --radius-2xl: 12px;
+            --radius-xl: 10px;
+            --radius-lg: 8px;
+            --radius-md: 6px;
+            --radius-sm: 4px;
+            --radius-xs: 2px;
             --radius-full: 980px;
 
             /* ---- Spacing (4px grid) ---- */
@@ -78,34 +113,20 @@
             --space-xl: 32px;
             --space-2xl: 48px;
 
-            /* ---- Animation Curves ---- */
-            --ease-spring: cubic-bezier(0.22, 0.85, 0.15, 1.2);
+            /* ---- Animation Curves (Cyberpunk 2077) ---- */
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-            --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
-            --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-            --ease-smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
+            --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+            --ease-glitch: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
             /* ---- Duration Tokens ---- */
-            --dur-fast: 150ms;
-            --dur-normal: 250ms;
-            --dur-slow: 400ms;
-            --dur-glacial: 800ms;
+            --dur-fast: 100ms;
+            --dur-normal: 180ms;
+            --dur-slow: 300ms;
 
-            /* ---- Card Accent Gradients ---- */
-            --card-blue-bg: linear-gradient(160deg, rgba(10,132,255,0.10), rgba(10,132,255,0.02));
-            --card-green-bg: linear-gradient(160deg, rgba(48,209,88,0.08), rgba(48,209,88,0.02));
-            --card-orange-bg: linear-gradient(160deg, rgba(255,159,10,0.08), rgba(255,159,10,0.02));
-            --card-purple-bg: linear-gradient(160deg, rgba(191,90,242,0.08), rgba(191,90,242,0.02));
-            --card-red-bg: linear-gradient(160deg, rgba(255,69,58,0.10), rgba(255,69,58,0.02));
-            --card-teal-bg: linear-gradient(160deg, rgba(0,191,179,0.08), rgba(0,191,179,0.02));
-
-            /* ---- Glass Shine Overlay ---- */
-            --shine-subtle: linear-gradient(105deg,
-                transparent 35%,
-                rgba(255,255,255,0.02) 48%,
-                rgba(255,255,255,0.04) 50%,
-                rgba(255,255,255,0.02) 52%,
-                transparent 65%);
+            /* ---- Cyberpunk 2077 Effects ---- */
+            --scanline-opacity: 0.03;
+            --grid-opacity: 0.05;
         }
 
         /* ============================================================
@@ -113,101 +134,191 @@
            ============================================================ */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* 全局字体继承 - 确保所有元素使用像素字体 */
+        *, *::before, *::after {
+            font-family: inherit;
+        }
+
         html {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            font-family: "Zpix", "VT323", "Share Tech Mono", "Courier New", "Lucida Console", "Monaco", monospace;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: unset;
+            font-smooth: never;
             -webkit-text-size-adjust: 100%;
             text-size-adjust: 100%;
         }
 
         body {
+            font-family: "Zpix", "VT323", "Share Tech Mono", "Courier New", "Lucida Console", "Monaco", monospace;
             background-color: var(--bg-deep);
-            color: var(--text-primary);
-            line-height: 1.47059;
+            color: var(--text-secondary);
+            line-height: 1.5;
             font-weight: 400;
-            letter-spacing: -0.022em;
+            letter-spacing: 0.05em;
+            font-size: 16px;
             min-height: 100vh;
-            padding-bottom: 80px;
+            padding-bottom: 40px;
             position: relative;
             overflow-x: hidden;
-            /* Layered background: radial orbs + subtle grain */
-            background-image:
-                radial-gradient(ellipse 900px 500px at 5% 0%, rgba(10, 132, 255, 0.04) 0%, transparent 65%),
-                radial-gradient(ellipse 700px 450px at 95% 5%, rgba(191, 90, 242, 0.03) 0%, transparent 65%),
-                radial-gradient(ellipse 600px 350px at 60% 15%, rgba(0, 191, 179, 0.025) 0%, transparent 65%),
-                radial-gradient(ellipse 500px 300px at 30% 80%, rgba(255, 159, 10, 0.02) 0%, transparent 65%);
-            background-repeat: no-repeat;
-            background-attachment: fixed;
         }
 
-        /* ---- SVG Noise Texture Overlay ---- */
+        /* Cyberpunk Grid Background */
         body::before {
             content: '';
             position: fixed;
-            inset: 0;
-            z-index: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(rgba(252, 238, 9, var(--grid-opacity)) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(252, 238, 9, var(--grid-opacity)) 1px, transparent 1px);
+            background-size: 50px 50px;
             pointer-events: none;
-            opacity: 0.018;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            background-size: 256px 256px;
+            z-index: 0;
         }
 
-        /* ---- Floating Orbs (ambient, slow drift) ---- */
+        /* Scanline Effect */
         body::after {
             content: '';
             position: fixed;
-            inset: 0;
-            z-index: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, var(--scanline-opacity)) 2px,
+                rgba(0, 0, 0, var(--scanline-opacity)) 4px
+            );
             pointer-events: none;
-            background:
-                radial-gradient(circle 400px at 15% 10%, rgba(10, 132, 255, 0.07) 0%, transparent 70%),
-                radial-gradient(circle 350px at 85% 20%, rgba(191, 90, 242, 0.05) 0%, transparent 70%),
-                radial-gradient(circle 300px at 50% 75%, rgba(0, 191, 179, 0.04) 0%, transparent 70%);
-            animation: orbDrift 30s ease-in-out infinite alternate;
+            z-index: 1;
+            animation: scanline 8s linear infinite;
         }
 
-        @keyframes orbDrift {
-            0% { opacity: 0.6; transform: translate(0, 0) scale(1); }
-            33% { opacity: 0.8; transform: translate(30px, -15px) scale(1.05); }
-            66% { opacity: 0.5; transform: translate(-20px, 10px) scale(0.97); }
-            100% { opacity: 0.7; transform: translate(15px, -5px) scale(1.02); }
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
         }
 
         /* ============================================================
-           HEADER — Refined Glass 2.0
+           BORDER MARQUEE — 跑马灯呼吸灯效果
+           ============================================================ */
+        @keyframes borderMarquee {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        @keyframes borderBreathe {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        /* 跑马灯边框通用 mixin — 通过 ::before 伪元素实现 */
+        .marquee-border {
+            position: relative;
+            overflow: visible;
+        }
+        .marquee-border::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--accent-purple) 15%,
+                var(--accent-blue) 35%,
+                var(--accent-purple) 55%,
+                transparent 70%
+            );
+            background-size: 200% 100%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: borderMarquee 4s linear infinite, borderBreathe 3s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 应用跑马灯边框的组件 — 使用 ::after 避免覆盖已有的 ::before */
+        .stat-card::after,
+        .toolbar::after,
+        .sidebar::after,
+        .table-container::after,
+        .chart-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            border: 1px solid transparent;
+            background: linear-gradient(
+                var(--bg-surface),
+                var(--bg-surface)
+            ) padding-box,
+            linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--accent-purple) 15%,
+                var(--accent-blue) 35%,
+                var(--accent-purple) 55%,
+                transparent 70%
+            ) border-box;
+            background-size: 100% 100%, 200% 100%;
+            animation: borderMarquee 4s linear infinite, borderBreathe 3s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* header 底部已有的渐变线也加上跑马灯 */
+        header::after {
+            animation: borderMarquee 3s linear infinite, borderBreathe 4s ease-in-out infinite;
+            background-size: 200% 100%;
+        }
+
+        /* ============================================================
+           HEADER — Cyberpunk Glass
            ============================================================ */
         header {
             position: fixed;
             top: 0; left: 0; right: 0;
             z-index: 2000;
-            background: rgba(12, 14, 19, 0.65);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 12px 40px;
+            background: rgba(10, 10, 15, 0.9);
+            border-bottom: 1px solid var(--card-border);
+            padding: 10px 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 4px 24px rgba(0,0,0,0.4);
-            transition: all var(--dur-slow) var(--ease-out-expo);
+            transition: all var(--dur-slow) var(--ease-smooth);
+            backdrop-filter: blur(20px);
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-purple), var(--accent-blue), transparent);
         }
 
         header.scrolled {
-            padding: 8px 40px;
-            background: rgba(12, 14, 19, 0.85);
-            box-shadow: 0 1px 0 rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.6);
+            padding: 8px 28px;
+            background: rgba(10, 10, 15, 0.95);
+            box-shadow: 0 4px 30px rgba(252, 238, 9, 0.1);
         }
 
         header h1 {
-            font-size: 20px;
-            font-weight: 650;
-            letter-spacing: -0.022em;
-            color: var(--text-primary);
-            background: linear-gradient(135deg, #F5F5F7 0%, #A1A1A6 60%, #F5F5F7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-family: "Zpix", "Press Start 2P", "VT323", monospace;
+            font-size: 16px;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            color: var(--accent-purple-light);
+            text-shadow: 0 0 20px rgba(252, 238, 9, 0.5);
+            text-transform: uppercase;
         }
 
         .header-actions {
@@ -219,83 +330,202 @@
         .header-actions-group {
             display: flex;
             gap: 2px;
-            background: rgba(255,255,255,0.04);
+            background: var(--card-bg);
             padding: 3px;
             border-radius: var(--radius-full);
-            border: 1px solid var(--glass-border);
-            box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.06);
+            border: 1px solid var(--card-border);
         }
 
         /* ============================================================
-           BUTTON SYSTEM — Pill-shaped, refined feedback
+           COLOR PICKER — Theme Color Selector
+           ============================================================ */
+        .color-picker-wrapper {
+            position: relative;
+        }
+        .color-picker-btn i {
+            font-size: 18px;
+        }
+        .color-picker-panel {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            min-width: 200px;
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            backdrop-filter: blur(20px);
+        }
+        .color-picker-panel.show { display: block; }
+        .color-picker-title {
+            font-family: "Zpix", "Press Start 2P", "VT323", monospace;
+            font-size: 12px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .color-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .color-swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all var(--dur-normal) var(--ease-spring);
+            position: relative;
+        }
+        .color-swatch:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 12px currentColor;
+        }
+        .color-swatch.active {
+            border-color: #fff;
+            box-shadow: 0 0 12px currentColor;
+        }
+        .color-swatch.active::after {
+            content: '✓';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 16px;
+            font-weight: 900;
+        }
+        .color-picker-custom {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-top: 8px;
+            border-top: 1px solid var(--card-border);
+        }
+        .color-picker-custom label {
+            font-family: "Zpix", "VT323", monospace;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .color-picker-custom input[type="color"] {
+            width: 40px;
+            height: 28px;
+            border: 1px solid var(--card-border);
+            border-radius: 4px;
+            cursor: pointer;
+            background: transparent;
+            padding: 2px;
+        }
+
+        /* ============================================================
+           BUTTON SYSTEM — Cyberpunk Neon
            ============================================================ */
         .btn {
+            font-family: "Zpix", "Press Start 2P", "VT323", "Share Tech Mono", "Courier New", monospace;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: var(--radius-full);
-            font-size: 13px;
-            font-weight: 510;
-            letter-spacing: -0.01em;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 10px;
+            font-weight: 400;
+            letter-spacing: 0.1em;
             cursor: pointer;
-            border: none;
-            transition: all var(--dur-normal) var(--ease-out-expo);
+            border: 1px solid var(--card-border);
+            transition: all var(--dur-normal) var(--ease-smooth);
             outline: none;
             text-decoration: none;
             position: relative;
             overflow: hidden;
             white-space: nowrap;
+            text-transform: uppercase;
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(252, 238, 9, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-purple);
+            box-shadow: var(--glow-purple);
+            color: var(--accent-purple-light);
         }
 
         .btn:active { transform: scale(0.95); }
 
         .btn-primary {
-            background: var(--accent-blue);
-            color: #FFF;
-            box-shadow: 0 2px 8px rgba(10, 132, 255, 0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark));
+            color: #fff;
+            font-weight: 700;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 15px rgba(252, 238, 9, 0.3);
         }
         .btn-primary:hover {
-            background: #1a8eff;
-            box-shadow: 0 4px 16px rgba(10, 132, 255, 0.5), inset 0 1px 0 rgba(255,255,255,0.25);
+            background: linear-gradient(135deg, var(--accent-purple-light), var(--accent-purple));
+            box-shadow: var(--glow-purple-intense);
             transform: translateY(-1px);
         }
 
         .btn-outline {
-            background: rgba(255,255,255,0.05);
-            color: var(--text-primary);
-            border: 1px solid rgba(255,255,255,0.08);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.06);
+            background: transparent;
+            color: var(--accent-purple-light);
+            border: 1px solid var(--accent-purple);
         }
         .btn-outline:hover {
-            background: rgba(255,255,255,0.10);
-            border-color: rgba(255,255,255,0.14);
-            box-shadow: var(--shadow-sm), inset 0 0.5px 0 rgba(255,255,255,0.1);
-            transform: translateY(-1px);
+            background: rgba(252, 238, 9, 0.1);
+            border-color: var(--accent-purple-light);
+            box-shadow: var(--glow-purple);
+            color: var(--accent-purple-light);
         }
 
         .btn-ghost {
             background: transparent;
-            color: var(--text-secondary);
+            color: var(--text-tertiary);
             padding: 8px;
-            border-radius: 50%;
+            border-radius: var(--radius-sm);
+            border-color: transparent;
         }
         .btn-ghost:hover {
-            color: var(--text-primary);
-            background: rgba(255,255,255,0.06);
+            color: var(--accent-purple-light);
+            background: rgba(252, 238, 9, 0.1);
+            border-color: rgba(252, 238, 9, 0.3);
         }
         .btn-ghost:hover i {
-            transform: scale(1.12) rotate(-3deg);
-            transition: transform 0.3s var(--ease-spring);
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px var(--accent-purple));
+        }
+        .btn-ghost i {
+            transition: all var(--dur-normal) var(--ease-spring);
         }
 
-        .btn-danger { color: var(--text-secondary); }
+        .btn-danger { color: var(--text-tertiary); border-color: transparent; }
         .btn-danger:hover {
             color: var(--accent-red);
-            background: rgba(255, 69, 58, 0.12);
+            background: rgba(255, 0, 64, 0.1);
+            border-color: rgba(255, 0, 64, 0.3);
+            box-shadow: 0 0 10px rgba(255, 0, 64, 0.2);
         }
 
         /* ============================================================
@@ -305,59 +535,71 @@
             display: flex;
             max-width: 1440px;
             margin: 0 auto;
-            padding: 28px 24px;
-            padding-top: 96px;
-            gap: 28px;
+            padding: 16px;
+            padding-top: 60px;
+            gap: 16px;
             align-items: flex-start;
             position: relative;
             z-index: 1;
         }
 
         .sidebar {
-            width: 220px;
+            width: 180px;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             gap: 2px;
             position: sticky;
             top: 96px;
-            background: rgba(17, 19, 24, 0.35);
-            backdrop-filter: var(--glass-blur-light);
-            -webkit-backdrop-filter: var(--glass-blur-light);
-            border-radius: var(--radius-xl);
+            background: var(--bg-surface);
+            border-radius: var(--radius-md);
             padding: 8px;
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-highlight);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
+            opacity: 0.5;
         }
 
         .sidebar-section {
-            padding: 8px 12px 4px;
+            padding: 10px 12px 6px;
         }
 
         .sidebar-label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.06em;
+            font-family: "Zpix", "Press Start 2P", "VT323", monospace;
+            font-size: 8px;
+            font-weight: 400;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
-            color: var(--text-quaternary);
-            margin-bottom: 4px;
+            color: var(--accent-purple);
+            margin-bottom: 8px;
             padding-left: 4px;
+            text-shadow: 0 0 8px rgba(252, 238, 9, 0.3);
         }
 
         .nav-item {
+            font-family: "Zpix", "VT323", "Share Tech Mono", "Courier New", "Lucida Console", "Monaco", monospace;
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 10px 14px;
-            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
             background: transparent;
-            color: var(--text-secondary);
-            border: none;
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: -0.01em;
+            color: var(--text-tertiary);
+            border: 1px solid transparent;
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 0.05em;
             cursor: pointer;
-            transition: all var(--dur-normal) var(--ease-out-expo);
+            transition: all var(--dur-normal) var(--ease-smooth);
             text-align: left;
             outline: none;
             position: relative;
@@ -365,37 +607,59 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.04);
+            background: rgba(252, 238, 9, 0.08);
             color: var(--text-primary);
+            border-color: rgba(252, 238, 9, 0.2);
         }
 
         .nav-item.active {
-            background: rgba(10, 132, 255, 0.12);
-            color: var(--accent-blue);
-            box-shadow: 0 0 0 0.5px rgba(10, 132, 255, 0.2);
-            font-weight: 590;
+            background: rgba(252, 238, 9, 0.12);
+            color: var(--accent-purple-light);
+            font-weight: 600;
+            border-color: rgba(252, 238, 9, 0.3);
+            box-shadow: inset 0 0 15px rgba(252, 238, 9, 0.1);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 60%;
+            background: var(--accent-purple);
+            border-radius: 0 2px 2px 0;
+            box-shadow: 0 0 8px var(--accent-purple);
         }
 
         .nav-item i {
             font-size: 18px;
             transition: all var(--dur-normal) var(--ease-spring);
-            opacity: 0.7;
+            opacity: 0.6;
         }
-        .nav-item:hover i { opacity: 1; transform: scale(1.08); }
-        .nav-item.active i { opacity: 1; color: var(--accent-blue); }
+        .nav-item:hover i { opacity: 1; }
+        .nav-item.active i {
+            opacity: 1;
+            color: var(--accent-purple-light);
+            filter: drop-shadow(0 0 5px var(--accent-purple));
+        }
 
         .nav-badge {
             margin-left: auto;
             font-size: 11px;
-            font-weight: 600;
-            padding: 2px 8px;
+            font-weight: 700;
+            padding: 3px 10px;
             border-radius: var(--radius-full);
-            background: rgba(255,255,255,0.06);
-            color: var(--text-tertiary);
+            background: var(--card-bg);
+            color: var(--text-quaternary);
+            border: 1px solid var(--card-border);
         }
         .nav-item.active .nav-badge {
-            background: rgba(10, 132, 255, 0.15);
-            color: var(--accent-blue);
+            background: rgba(252, 238, 9, 0.15);
+            color: var(--accent-purple-light);
+            border-color: rgba(252, 238, 9, 0.3);
+            box-shadow: 0 0 8px rgba(252, 238, 9, 0.2);
         }
 
         .main-content {
@@ -403,31 +667,40 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 12px;
         }
 
         /* ============================================================
-           TOOLBAR — Refined search & filters
+           TOOLBAR — Cyberpunk Search & Filters
            ============================================================ */
         .toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            background: rgba(17, 19, 24, 0.45);
+            gap: 8px;
+            background: var(--bg-surface);
             padding: 8px 16px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm), var(--glass-highlight);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: var(--glass-blur-light);
-            -webkit-backdrop-filter: var(--glass-blur-light);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
             position: relative;
             z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .toolbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
+            opacity: 0.5;
         }
 
         .search-box {
             position: relative;
-            width: 240px;
+            width: 260px;
         }
 
         .search-box i {
@@ -435,62 +708,78 @@
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-tertiary);
+            color: var(--accent-purple);
             font-size: 15px;
-            transition: color 0.2s;
+            transition: all 0.2s;
             pointer-events: none;
         }
 
         .search-input {
+            font-family: "Zpix", "VT323", "Share Tech Mono", monospace;
             width: 100%;
-            padding: 8px 14px 8px 34px;
-            border-radius: var(--radius-full);
-            border: 1px solid transparent;
-            background: rgba(255,255,255,0.04);
-            font-size: 13px;
+            padding: 10px 16px 10px 36px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--card-border);
+            background: var(--input-bg);
+            font-size: 18px;
             color: var(--text-primary);
-            transition: all var(--dur-normal) var(--ease-out-expo);
+            transition: all var(--dur-normal) var(--ease-smooth);
             outline: none;
+            letter-spacing: 0.05em;
         }
 
-        .search-input::placeholder { color: var(--text-tertiary); }
+        .search-input::placeholder {
+            color: var(--text-quaternary);
+            letter-spacing: 0.08em;
+        }
 
         .search-input:focus {
-            background: rgba(255,255,255,0.07);
-            border-color: rgba(10, 132, 255, 0.4);
-            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 2px rgba(252, 238, 9, 0.15), var(--glow-purple);
+        }
+
+        .search-input:focus + i,
+        .search-input:focus ~ i {
+            color: var(--accent-purple-light);
+            filter: drop-shadow(0 0 5px var(--accent-purple));
         }
 
         .filter-group {
             display: flex;
             gap: 2px;
-            background: rgba(255,255,255,0.03);
+            background: var(--bg-surface);
             padding: 3px;
-            border-radius: var(--radius-full);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--card-border);
         }
 
         .filter-btn {
-            padding: 5px 14px;
-            border-radius: var(--radius-full);
-            font-size: 12px;
-            font-weight: 550;
-            letter-spacing: -0.01em;
-            color: var(--text-secondary);
-            border: none;
+            font-family: "Zpix", "Press Start 2P", "VT323", monospace;
+            padding: 8px 16px;
+            border-radius: var(--radius-xs);
+            font-size: 9px;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            border: 1px solid transparent;
             background: transparent;
             cursor: pointer;
-            transition: all var(--dur-normal) var(--ease-out-expo);
+            transition: all var(--dur-normal) var(--ease-smooth);
+            text-transform: uppercase;
         }
 
         .filter-btn:not(.active):hover {
-            background: rgba(255,255,255,0.05);
+            background: rgba(252, 238, 9, 0.1);
             color: var(--text-primary);
+            border-color: rgba(252, 238, 9, 0.2);
         }
 
         .filter-btn.active {
-            background: rgba(255,255,255,0.1);
-            color: #FFF;
-            box-shadow: var(--shadow-xs);
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark));
+            color: #fff;
+            font-weight: 700;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 10px rgba(252, 238, 9, 0.3);
         }
 
         /* ============================================================
@@ -499,7 +788,7 @@
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1.3fr;
-            gap: 16px;
+            gap: 10px;
         }
 
         .stats-subgrid {
@@ -509,118 +798,128 @@
         }
 
         .stat-card {
-            background: rgba(17, 19, 24, 0.5);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-xl);
-            padding: 20px 24px;
-            box-shadow: var(--shadow-sm), var(--glass-highlight);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            backdrop-filter: var(--glass-blur-light);
-            -webkit-backdrop-filter: var(--glass-blur-light);
-            transition: all var(--dur-slow) var(--ease-out-expo);
+            gap: 6px;
+            transition: all var(--dur-slow) var(--ease-smooth);
             position: relative;
             overflow: hidden;
             cursor: default;
-        }
-
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.05);
-            pointer-events: none;
-            z-index: 2;
+            backdrop-filter: blur(10px);
         }
 
         .stat-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(ellipse at 30% 0%, rgba(255,255,255,0.04), transparent 60%);
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
             opacity: 0;
-            transition: opacity var(--dur-slow) var(--ease-out-expo);
-            pointer-events: none;
-            z-index: 1;
+            transition: opacity var(--dur-slow);
         }
 
         .stat-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--glass-border-hover);
-            box-shadow: var(--shadow-md), var(--glass-highlight);
+            border-color: var(--card-border-hover);
+            box-shadow: var(--glow-purple);
         }
-        .stat-card:hover::before { opacity: 1; }
 
-        /* Card color variants */
-        .stat-card.card-blue { background: var(--card-blue-bg); }
-        .stat-card.card-orange { background: var(--card-orange-bg); }
-        .stat-card.card-green { background: var(--card-green-bg); }
-        .stat-card.card-purple { background: var(--card-purple-bg); }
-        .stat-card.card-red { background: var(--card-red-bg); }
-        .stat-card.card-teal { background: var(--card-teal-bg); }
+        .stat-card:hover::before {
+            opacity: 1;
+        }
 
-        .stat-card.card-blue:hover { box-shadow: var(--shadow-md), var(--shadow-glow-blue); }
-        .stat-card.card-orange:hover { box-shadow: var(--shadow-md), var(--shadow-glow-orange); }
-        .stat-card.card-green:hover { box-shadow: var(--shadow-md), var(--shadow-glow-green); }
+        /* Card color variants — neon glow borders */
+        .stat-card.card-blue {
+            border-left: 3px solid var(--accent-blue);
+            box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);
+        }
+        .stat-card.card-orange {
+            border-left: 3px solid var(--accent-orange);
+            box-shadow: inset 0 0 15px rgba(255, 107, 0, 0.05);
+        }
+        .stat-card.card-green {
+            border-left: 3px solid var(--accent-green);
+            box-shadow: inset 0 0 15px rgba(0, 255, 136, 0.05);
+        }
+        .stat-card.card-purple {
+            border-left: 3px solid var(--accent-purple);
+            box-shadow: inset 0 0 15px rgba(252, 238, 9, 0.05);
+        }
+        .stat-card.card-red {
+            border-left: 3px solid var(--accent-red);
+            box-shadow: inset 0 0 15px rgba(255, 0, 64, 0.05);
+        }
+        .stat-card.card-teal {
+            border-left: 3px solid var(--accent-yellow);
+            box-shadow: inset 0 0 15px rgba(255, 230, 0, 0.05);
+        }
 
         .stat-card.over-budget {
-            background: var(--card-red-bg);
-            border-color: rgba(255, 69, 58, 0.2);
+            border-left-color: var(--accent-red);
+            animation: glitch-border 2s infinite;
         }
         .stat-card.over-budget .value {
-            background: none;
-            -webkit-text-fill-color: var(--accent-red);
             color: var(--accent-red);
-        }
-        .stat-card.over-budget .label {
-            color: var(--accent-red);
-            opacity: 0.9;
+            text-shadow: 0 0 10px rgba(255, 0, 64, 0.5);
         }
 
         .stat-card.positive .value {
-            background: none;
-            -webkit-text-fill-color: var(--accent-green);
             color: var(--accent-green);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
-        .stat-card.positive .label {
-            color: var(--accent-green);
-            opacity: 0.9;
+
+        @keyframes glitch-border {
+            0%, 95%, 100% { border-left-color: var(--accent-red); }
+            96% { border-left-color: var(--accent-blue); transform: translateX(1px); }
+            97% { border-left-color: var(--accent-purple); transform: translateX(-1px); }
+            98% { border-left-color: var(--accent-red); transform: translateX(0); }
         }
 
         .stat-card .label {
-            font-size: 11px;
-            color: var(--text-tertiary);
-            font-weight: 600;
-            letter-spacing: 0.04em;
+            font-family: "Zpix", "Press Start 2P", "VT323", monospace;
+            font-size: 9px;
+            color: var(--accent-purple-light);
+            font-weight: 400;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
             display: flex;
             align-items: center;
-            gap: 6px;
-            position: relative;
-            z-index: 3;
+            gap: 8px;
         }
 
         .stat-card .label i {
-            font-size: 15px;
-            opacity: 0.7;
+            font-size: 16px;
+            opacity: 0.8;
+            filter: drop-shadow(0 0 5px var(--accent-purple));
         }
 
+        .stat-card.card-blue .label { color: var(--accent-blue); }
+        .stat-card.card-blue .label i { filter: drop-shadow(0 0 5px var(--accent-blue)); }
+        .stat-card.card-green .label { color: var(--accent-green); }
+        .stat-card.card-green .label i { filter: drop-shadow(0 0 5px var(--accent-green)); }
+        .stat-card.card-orange .label { color: var(--accent-blue); }
+        .stat-card.card-orange .label i { filter: drop-shadow(0 0 5px var(--accent-blue)); }
+
         .stat-card .value {
-            font-size: 36px;
-            font-weight: 700;
+            font-family: "Zpix", "Press Start 2P", "VT323", monospace;
+            font-size: 24px;
+            font-weight: 400;
             color: var(--text-primary);
-            letter-spacing: -0.025em;
-            line-height: 1.1;
+            letter-spacing: 0.05em;
+            line-height: 1.3;
             font-variant-numeric: tabular-nums;
-            background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.75) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-            z-index: 3;
+            text-shadow: 0 0 20px rgba(252, 238, 9, 0.3);
         }
+
+        .stat-card.card-blue .value { text-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
+        .stat-card.card-green .value { text-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+        .stat-card.card-orange .value { text-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
+        .stat-card.card-purple .value { text-shadow: 0 0 20px rgba(252, 238, 9, 0.3); }
 
         /* ============================================================
            CHARTS — Unified card style
@@ -632,40 +931,57 @@
         .charts-grid {
             display: grid;
             grid-template-columns: 3fr 2fr;
-            gap: 16px;
+            gap: 10px;
         }
 
         .chart-card {
-            background: rgba(17, 19, 24, 0.45);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-xl);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
             padding: 20px 24px;
-            box-shadow: var(--shadow-sm), var(--glass-highlight);
-            backdrop-filter: var(--glass-blur-light);
-            -webkit-backdrop-filter: var(--glass-blur-light);
-            transition: all var(--dur-slow) var(--ease-out-expo);
+            transition: all var(--dur-slow) var(--ease-smooth);
             display: flex;
             flex-direction: column;
             gap: 16px;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+            opacity: 0;
+            transition: opacity var(--dur-slow);
         }
 
         .chart-card:hover {
-            border-color: var(--glass-border-hover);
-            box-shadow: var(--shadow-md), var(--shadow-glow-blue);
+            border-color: var(--card-border-hover);
+            box-shadow: var(--glow-blue);
+        }
+
+        .chart-card:hover::before {
+            opacity: 1;
         }
 
         .chart-header {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            letter-spacing: -0.01em;
+            font-family: "Zpix", "Press Start 2P", "VT323", monospace;
+            font-size: 10px;
+            font-weight: 400;
+            color: var(--accent-blue);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
             display: flex;
             align-items: center;
             gap: 8px;
             padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid var(--card-border);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
         }
 
         .chart-body {
@@ -676,39 +992,27 @@
         }
 
         /* ============================================================
-           DATA TABLE — Modern refined
+           DATA TABLE — Cyberpunk Style
            ============================================================ */
         .table-container {
-            background: rgba(17, 19, 24, 0.4);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-sm);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
             overflow: hidden;
-            backdrop-filter: var(--glass-blur-light);
-            -webkit-backdrop-filter: var(--glass-blur-light);
-            transition: box-shadow var(--dur-slow) var(--ease-out-expo);
             position: relative;
+            backdrop-filter: blur(10px);
         }
 
-        .table-container:hover {
-            box-shadow: var(--shadow-md);
-        }
-
-        /* Scroll gradient indicator at top */
         .table-container::before {
             content: '';
-            position: sticky;
+            position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            z-index: 12;
-            background: linear-gradient(to bottom, rgba(10,132,255,0.06), transparent);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-purple), var(--accent-blue), transparent);
+            z-index: 1;
         }
-        .table-container.is-scrolled::before { opacity: 1; }
 
         table {
             border-collapse: collapse;
@@ -717,21 +1021,21 @@
         }
 
         th {
-            background: rgba(22, 25, 32, 0.6);
-            padding: 12px 14px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.04em;
+            font-family: "Zpix", "Press Start 2P", "VT323", monospace;
+            background: rgba(252, 238, 9, 0.08);
+            padding: 14px 16px;
+            font-size: 10px;
+            font-weight: 400;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--text-quaternary);
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--accent-purple-light);
+            border-bottom: 1px solid var(--card-border);
             position: sticky;
             top: 0;
             z-index: 10;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             user-select: none;
             white-space: nowrap;
+            text-shadow: 0 0 10px rgba(252, 238, 9, 0.3);
         }
 
         .resize-handle {
@@ -747,7 +1051,7 @@
         }
         .resize-handle:hover,
         .resize-handle.active {
-            background: var(--accent-blue);
+            background: var(--accent-yellow);
         }
 
         th.sortable {
@@ -769,54 +1073,43 @@
         th.sortable.active.desc i { transform: rotate(180deg); }
 
         td {
-            padding: 12px 14px;
-            font-size: 13px;
-            border-bottom: 1px solid rgba(255,255,255,0.025);
+            font-family: "Zpix", "VT323", "Share Tech Mono", "Courier New", "Lucida Console", "Monaco", monospace;
+            padding: 14px 16px;
+            font-size: 18px;
+            border-bottom: 1px solid rgba(252, 238, 9, 0.06);
             vertical-align: middle;
             background: transparent;
-            transition: background 0.15s var(--ease-out-expo);
+            transition: all var(--dur-normal) var(--ease-smooth);
             font-variant-numeric: tabular-nums;
+            color: var(--text-secondary);
         }
 
-        /* Row hover with subtle highlight + left indicator */
         tr {
-            transition: background 0.15s var(--ease-out-expo), transform 0.15s var(--ease-out-expo);
-            animation: rowFadeIn 0.4s var(--ease-out-expo) backwards;
+            transition: all var(--dur-normal) var(--ease-smooth);
         }
-
-        @keyframes rowFadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        tr:nth-child(1) { animation-delay: 0.02s; }
-        tr:nth-child(2) { animation-delay: 0.05s; }
-        tr:nth-child(3) { animation-delay: 0.08s; }
-        tr:nth-child(4) { animation-delay: 0.11s; }
-        tr:nth-child(5) { animation-delay: 0.14s; }
-        tr:nth-child(6) { animation-delay: 0.17s; }
-        tr:nth-child(7) { animation-delay: 0.20s; }
-        tr:nth-child(8) { animation-delay: 0.23s; }
-        tr:nth-child(9) { animation-delay: 0.26s; }
-        tr:nth-child(10) { animation-delay: 0.29s; }
 
         tr:hover td {
-            background: rgba(255,255,255,0.025);
+            background: rgba(252, 238, 9, 0.05);
+        }
+
+        tr:hover {
+            box-shadow: inset 0 0 20px rgba(252, 238, 9, 0.03);
         }
 
         tr:last-child td { border-bottom: none; }
 
-        /* Over-budget row */
+        /* Over-budget row - glitch effect */
         tr.row-over-budget td {
-            background: rgba(255, 69, 58, 0.04);
-            border-bottom-color: rgba(255, 69, 58, 0.06);
+            background: rgba(255, 0, 64, 0.04);
         }
         tr.row-over-budget:hover td {
-            background: rgba(255, 69, 58, 0.07);
+            background: rgba(255, 0, 64, 0.08);
+            box-shadow: inset 0 0 15px rgba(255, 0, 64, 0.05);
         }
         tr.row-over-budget td[data-col="actualPrice"] {
             color: var(--accent-red);
-            font-weight: 600;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(255, 0, 64, 0.5);
         }
 
         /* Drag handle */
@@ -829,75 +1122,88 @@
             justify-content: center;
             transition: color 0.15s, background 0.15s;
             padding: 4px;
-            border-radius: 6px;
+            border-radius: var(--radius-sm);
         }
         .drag-handle:hover {
-            color: var(--text-secondary);
-            background: rgba(255,255,255,0.06);
+            color: var(--text-tertiary);
+            background: var(--card-bg);
         }
         .drag-handle:active { cursor: grabbing; transform: scale(0.9); }
 
-        .sortable-ghost { opacity: 0.2; background: rgba(10,132,255,0.08); border-radius: var(--radius-md); }
+        .sortable-ghost { opacity: 0.2; background: rgba(187, 159, 58, 0.08); border-radius: var(--radius-md); }
         .sortable-drag {
-            background: rgba(22, 25, 32, 0.95);
-            box-shadow: var(--shadow-xl);
+            background: var(--bg-surface);
+            box-shadow: var(--shadow-lg);
             cursor: grabbing !important;
             border-radius: var(--radius-md);
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid var(--card-border);
             transform: scale(1.01);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
         }
 
         /* ============================================================
-           STATUS BADGES
+           STATUS BADGES — Cyberpunk Neon
            ============================================================ */
         .status-badge {
+            font-family: "Zpix", "Press Start 2P", "VT323", monospace;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 3px 12px;
-            border-radius: var(--radius-full);
-            font-size: 11px;
-            font-weight: 650;
-            letter-spacing: 0.01em;
+            padding: 6px 14px;
+            border-radius: var(--radius-xs);
+            font-size: 9px;
+            font-weight: 400;
+            letter-spacing: 0.1em;
             white-space: nowrap;
-            min-width: 48px;
+            min-width: 60px;
+            text-transform: uppercase;
+            border: 1px solid;
         }
         .status-badge::before {
             content: '';
             display: inline-block;
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            margin-right: 6px;
+            margin-right: 8px;
+            animation: badge-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badge-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
         }
 
         .status-done {
-            background: rgba(48, 209, 88, 0.1);
+            background: rgba(0, 255, 136, 0.08);
             color: var(--accent-green);
+            border-color: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.15);
         }
         .status-done::before {
             background: var(--accent-green);
-            box-shadow: 0 0 5px rgba(48, 209, 88, 0.5);
+            box-shadow: 0 0 6px var(--accent-green);
         }
 
         .status-paid {
-            background: rgba(255, 159, 10, 0.1);
-            color: var(--accent-orange);
+            background: rgba(0, 240, 255, 0.08);
+            color: var(--accent-blue);
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.15);
         }
         .status-paid::before {
-            background: var(--accent-orange);
-            box-shadow: 0 0 5px rgba(255, 159, 10, 0.5);
+            background: var(--accent-blue);
+            box-shadow: 0 0 6px var(--accent-blue);
         }
 
         .status-pending {
-            background: rgba(10, 132, 255, 0.1);
-            color: var(--accent-blue);
+            background: rgba(255, 230, 0, 0.08);
+            color: var(--accent-yellow);
+            border-color: rgba(255, 230, 0, 0.3);
+            box-shadow: 0 0 8px rgba(255, 230, 0, 0.15);
         }
         .status-pending::before {
-            background: var(--accent-blue);
-            box-shadow: 0 0 5px rgba(10, 132, 255, 0.5);
+            background: var(--accent-yellow);
+            box-shadow: 0 0 6px var(--accent-yellow);
         }
 
         /* ============================================================
@@ -908,13 +1214,11 @@
             top: 100%;
             right: 0;
             margin-top: 8px;
-            background: rgba(22, 25, 32, 0.9);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-lg);
+            background: var(--bg-surface);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
             padding: 6px;
-            box-shadow: var(--shadow-xl);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-lg);
             z-index: 1000;
             display: flex;
             flex-direction: column;
@@ -929,34 +1233,33 @@
             font-size: 13px;
             color: var(--text-primary);
             padding: 7px 10px;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
             transition: background 0.15s;
             white-space: nowrap;
         }
         .column-menu label:hover {
-            background: rgba(255,255,255,0.06);
+            background: var(--card-bg);
         }
         .column-menu input[type="checkbox"] {
-            accent-color: var(--accent-blue);
+            accent-color: var(--accent-yellow);
         }
 
         /* ============================================================
-           MODAL / SHEET — iOS-inspired
+           MODAL / SHEET — Cyberpunk Style
            ============================================================ */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(10, 10, 15, 0.85);
             z-index: 3000;
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 0;
             visibility: hidden;
-            transition: all var(--dur-slow) var(--ease-out-expo);
+            transition: all var(--dur-slow) var(--ease-smooth);
+            backdrop-filter: blur(8px);
         }
         .modal-overlay.active {
             opacity: 1;
@@ -964,60 +1267,93 @@
         }
 
         .modal {
-            background: rgba(22, 25, 32, 0.88);
-            border-radius: var(--radius-2xl);
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
             width: 100%;
             max-width: 560px;
-            box-shadow: var(--shadow-float), 0 0 80px rgba(10, 132, 255, 0.04);
-            transform: translateY(24px) scale(0.96);
-            transition: all 0.5s var(--ease-spring);
+            box-shadow: var(--shadow-xl), var(--glow-purple-intense);
+            transform: translateY(20px) scale(0.97);
+            transition: all 0.4s var(--ease-spring);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             min-height: 500px;
             max-height: calc(100vh - 60px);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--accent-purple);
             position: relative;
         }
+
+        .modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-purple), var(--accent-blue), var(--accent-pink), transparent);
+            z-index: 1;
+        }
+
+        .modal::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(rgba(252, 238, 9, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(252, 238, 9, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .modal-overlay.active .modal {
             transform: translateY(0) scale(1);
         }
 
         /* Sheet drag indicator (only on main modal) */
         .sheet-indicator {
-            width: 36px;
-            height: 5px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 3px;
-            margin: 10px auto 0;
+            width: 40px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 2px;
+            margin: 12px auto 0;
+            box-shadow: 0 0 8px rgba(252, 238, 9, 0.3);
         }
 
         .modal-header {
-            padding: 20px 28px 12px;
+            padding: 20px 28px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid var(--card-border);
+            position: relative;
+            z-index: 1;
         }
         .modal-header h2 {
-            font-size: 20px;
-            font-weight: 680;
-            letter-spacing: -0.022em;
-            color: var(--text-primary);
+            font-family: "Zpix", "Press Start 2P", "VT323", monospace;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            color: var(--accent-purple-light);
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(252, 238, 9, 0.4);
         }
 
         .modal-header .btn-ghost {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.04);
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-sm);
+            background: var(--card-bg);
             transition: all var(--dur-normal) var(--ease-spring);
+            border: 1px solid var(--card-border);
         }
         .modal-header .btn-ghost:hover {
-            background: rgba(255,255,255,0.12);
-            transform: rotate(90deg);
+            background: rgba(255, 0, 64, 0.1);
+            border-color: rgba(255, 0, 64, 0.3);
+            box-shadow: 0 0 10px rgba(255, 0, 64, 0.2);
         }
 
         .modal-body {
@@ -1030,34 +1366,36 @@
         }
         .modal-body::-webkit-scrollbar { width: 4px; }
         .modal-body::-webkit-scrollbar-track { background: transparent; }
-        .modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .modal-body::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
 
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
         .form-group.full { grid-column: span 2; }
         .form-group label {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.03em;
+            font-family: "Zpix", "Press Start 2P", "VT323", monospace;
+            font-size: 9px;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            color: var(--accent-purple-light);
             text-transform: uppercase;
-            color: var(--text-tertiary);
         }
 
         .form-control {
+            font-family: "Zpix", "VT323", "Share Tech Mono", monospace;
             padding: 10px 14px;
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 10px;
-            font-size: 14px;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-sm);
+            font-size: 18px;
             color: var(--text-primary);
-            background: rgba(255,255,255,0.03);
-            transition: all var(--dur-normal) var(--ease-out-expo);
+            background: var(--input-bg);
+            transition: all var(--dur-normal) var(--ease-smooth);
             outline: none;
             width: 100%;
+            letter-spacing: 0.05em;
         }
-        .form-control:hover { background: rgba(255,255,255,0.05); }
+        .form-control:hover { border-color: rgba(252, 238, 9, 0.3); }
         .form-control:focus {
-            background: rgba(255,255,255,0.06);
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.12);
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 2px rgba(252, 238, 9, 0.15), var(--glow-purple);
         }
         .form-control option { background: var(--bg-elevated); color: var(--text-primary); }
         textarea.form-control {
@@ -1068,47 +1406,70 @@
 
         .modal-footer {
             padding: 14px 28px 20px;
-            border-top: 1px solid rgba(255,255,255,0.04);
+            border-top: 1px solid var(--card-border);
             display: flex;
             justify-content: flex-end;
             gap: 10px;
-            background: rgba(17, 19, 24, 0.3);
         }
 
         body.modal-open { overflow: hidden; }
         #fileInput { display: none; }
 
         /* ============================================================
-           EMPTY STATE
+           EMPTY STATE — Cyberpunk Style
            ============================================================ */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: var(--text-secondary);
-            background: rgba(17, 19, 24, 0.2);
-            border-radius: var(--radius-xl);
-            border: 1px solid rgba(255,255,255,0.03);
+            color: var(--text-tertiary);
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
             margin: 20px;
             position: relative;
-        }
-        .empty-state i {
-            font-size: 44px;
-            color: var(--text-quaternary);
-            margin-bottom: 14px;
-            display: block;
-            animation: emptyFloat 3.5s ease-in-out infinite;
-        }
-        .empty-state p {
-            font-size: 15px;
-            font-weight: 500;
-            position: relative;
-            z-index: 1;
+            overflow: hidden;
         }
 
-        @keyframes emptyFloat {
-            0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
-            50% { transform: translateY(-10px) scale(1.04); opacity: 0.7; }
+        .empty-state::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
+            opacity: 0.5;
         }
+
+        .empty-state::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(rgba(252, 238, 9, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(252, 238, 9, 0.02) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: var(--accent-purple);
+            margin-bottom: 16px;
+            display: block;
+            filter: drop-shadow(0 0 15px rgba(252, 238, 9, 0.5));
+        }
+        .empty-state p {
+            font-family: "Zpix", "VT323", "Share Tech Mono", monospace;
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+        }
+
         /* ============================================================
            MOBILE RESPONSIVE (≤768px)
            ============================================================ */
@@ -1129,7 +1490,7 @@
             .layout-wrapper {
                 flex-direction: column;
                 padding: 12px;
-                padding-top: 120px;
+                padding-top: 12px;
                 gap: 14px;
             }
 
@@ -1302,20 +1663,25 @@
         }
 
         /* ============================================================
-           QUALITY: Scrollbar, Selection, Reduced Motion
+           QUALITY: Scrollbar, Selection, Reduced Motion — Cyberpunk
            ============================================================ */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
         ::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.08);
-            border-radius: 10px;
+            background: linear-gradient(180deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 3px;
+            box-shadow: 0 0 6px rgba(252, 238, 9, 0.3);
         }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.14); }
-        * { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--accent-purple-light), var(--accent-blue));
+            box-shadow: 0 0 10px rgba(252, 238, 9, 0.5);
+        }
+        * { scrollbar-width: thin; scrollbar-color: var(--accent-purple) var(--bg-deep); }
 
         ::selection {
-            background: rgba(10, 132, 255, 0.25);
+            background: rgba(252, 238, 9, 0.4);
             color: #FFF;
+            text-shadow: 0 0 10px rgba(252, 238, 9, 0.5);
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -1327,27 +1693,7 @@
         }
 
         /* ============================================================
-           ENTRANCE ANIMATIONS
-           ============================================================ */
-        @keyframes cardFadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .layout-wrapper {
-            animation: cardFadeIn 0.6s var(--ease-out-expo) forwards;
-        }
-        .stat-card { animation: cardFadeIn 0.5s var(--ease-out-expo) backwards; }
-        .stat-card:nth-child(1) { animation-delay: 0.04s; }
-        .stat-card:nth-child(2) { animation-delay: 0.10s; }
-        .stat-card:nth-child(3) { animation-delay: 0.16s; }
-        .stat-card:nth-child(4) { animation-delay: 0.22s; }
-        .chart-card { animation: cardFadeIn 0.5s var(--ease-out-expo) backwards; }
-        .chart-card:nth-child(1) { animation-delay: 0.08s; }
-        .chart-card:nth-child(2) { animation-delay: 0.20s; }
-
-        /* ============================================================
-           TOAST NOTIFICATIONS
+           TOAST NOTIFICATIONS — Cyberpunk Neon
            ============================================================ */
         #toast-container {
             position: fixed;
@@ -1356,33 +1702,46 @@
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             pointer-events: none;
         }
 
         .toast {
+            font-family: "Zpix", "VT323", "Share Tech Mono", monospace;
             pointer-events: auto;
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 13px 18px;
-            border-radius: var(--radius-lg);
-            background: rgba(28, 31, 40, 0.94);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-xl);
-            font-size: 13px;
-            font-weight: 500;
+            gap: 12px;
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-surface);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-lg);
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 0.05em;
             color: var(--text-primary);
-            min-width: 260px;
-            max-width: 400px;
+            min-width: 280px;
+            max-width: 420px;
             transform: translateX(120%);
             opacity: 0;
-            transition: transform 0.45s var(--ease-spring), opacity 0.35s ease;
+            transition: transform 0.4s var(--ease-spring), opacity 0.3s ease;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
+
+        .toast::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, currentColor, transparent);
+            opacity: 0.5;
+        }
+
         .toast.show { transform: translateX(0); opacity: 1; }
         .toast.hide { transform: translateX(120%); opacity: 0; }
         .toast::before {
@@ -1391,20 +1750,32 @@
             left: 0; top: 0; bottom: 0;
             width: 3px;
         }
-        .toast.success::before { background: var(--accent-green); }
-        .toast.error::before { background: var(--accent-red); }
-        .toast.info::before { background: var(--accent-blue); }
+        .toast.success {
+            border-color: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.1);
+        }
+        .toast.success::before { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+
+        .toast.error {
+            border-color: rgba(255, 0, 64, 0.3);
+            box-shadow: 0 0 15px rgba(255, 0, 64, 0.1);
+        }
+        .toast.error::before { background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); }
+
+        .toast.info {
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+        }
+        .toast.info::before { background: var(--accent-blue); box-shadow: 0 0 8px var(--accent-blue); }
+
         .toast i { font-size: 18px; }
-        .toast.success i { color: var(--accent-green); }
-        .toast.error i { color: var(--accent-red); }
-        .toast.info i { color: var(--accent-blue); }
+        .toast.success i { color: var(--accent-green); filter: drop-shadow(0 0 5px var(--accent-green)); }
+        .toast.error i { color: var(--accent-red); filter: drop-shadow(0 0 5px var(--accent-red)); }
+        .toast.info i { color: var(--accent-blue); filter: drop-shadow(0 0 5px var(--accent-blue)); }
 
         /* ============================================================
            RIPPLE EFFECT
            ============================================================ */
-        @keyframes rippleAnim {
-            to { transform: scale(4); opacity: 0; }
-        }
         .ripple-container {
             position: absolute;
             inset: 0;
@@ -1417,8 +1788,6 @@
             position: absolute;
             border-radius: 50%;
             background: rgba(255,255,255,0.3);
-            transform: scale(0);
-            animation: rippleAnim 0.6s ease-out forwards;
             pointer-events: none;
         }
         .btn-primary .ripple { background: rgba(255,255,255,0.4); }
@@ -1428,50 +1797,19 @@
         /* ============================================================
            ROW LEAVE ANIMATION
            ============================================================ */
-        @keyframes rowLeave {
-            from { opacity: 1; transform: scale(1); max-height: 60px; }
-            to { opacity: 0; transform: scale(0.95); max-height: 0; padding: 0; }
-        }
         tr.row-leave {
-            animation: rowLeave 0.3s var(--ease-out-expo) forwards;
             overflow: hidden;
         }
         tr.row-leave td { padding: 0 !important; border: none !important; }
 
-        @keyframes valuePop {
-            0% { transform: scale(1); }
-            35% { transform: scale(1.06); }
-            65% { transform: scale(0.97); }
-            100% { transform: scale(1); }
-        }
-        .stat-card .value.value-pop {
-            animation: valuePop 0.4s var(--ease-spring);
-        }
-
-        @keyframes shakeNoResult {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-5px); }
-            40% { transform: translateX(5px); }
-            60% { transform: translateX(-3px); }
-            80% { transform: translateX(3px); }
-        }
         .search-input.no-result {
-            animation: shakeNoResult 0.45s ease;
             border-color: rgba(255,69,58,0.3);
         }
 
         /* ============================================================
            BACKGROUND ORB
            ============================================================ */
-        .bg-orb {
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.3;
-            filter: blur(100px);
-        }
-    </style>
+        .bg-orb { display: none; }
     </style>
 </head>
 <body>
@@ -1508,6 +1846,27 @@
             <button class="btn btn-primary" onclick="openModal()">
                 <i class="ph ph-plus"></i> 新增项目
             </button>
+            <!-- 颜色选择器 -->
+            <div class="color-picker-wrapper">
+                <button class="btn btn-ghost color-picker-btn" onclick="toggleColorPicker()" title="切换主题色">
+                    <i class="ph ph-palette"></i>
+                </button>
+                <div class="color-picker-panel" id="colorPickerPanel">
+                    <div class="color-picker-title">主题色</div>
+                    <div class="color-presets">
+                        <button class="color-swatch active" data-color="#FCEE09" style="background:#FCEE09" title="赛博黄"></button>
+                        <button class="color-swatch" data-color="#00F0FF" style="background:#00F0FF" title="青色"></button>
+                        <button class="color-swatch" data-color="#FF0055" style="background:#FF0055" title="粉色"></button>
+                        <button class="color-swatch" data-color="#00FF88" style="background:#00FF88" title="绿色"></button>
+                        <button class="color-swatch" data-color="#FF6B00" style="background:#FF6B00" title="橙色"></button>
+                        <button class="color-swatch" data-color="#B825F0" style="background:#B825F0" title="紫色"></button>
+                    </div>
+                    <div class="color-picker-custom">
+                        <label>自定义</label>
+                        <input type="color" id="customColorInput" value="#FCEE09" onchange="applyThemeColor(this.value)">
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -2133,6 +2492,41 @@
         function handleFilter() {
             currentSearch = document.getElementById('searchInput').value.toLowerCase();
             applyFiltersAndSort();
+
+            // GSAP 搜索无结果抖动动画 - Cyberpunk Style
+            if (currentSearch && filteredData.length === 0) {
+                const searchInput = document.getElementById('searchInput');
+
+                // 抖动效果
+                gsap.fromTo(searchInput,
+                    { x: 0 },
+                    { x: 8, duration: 0.08, repeat: 6, yoyo: true, ease: "none" }
+                );
+
+                // 红色边框闪烁
+                gsap.fromTo(searchInput,
+                    { borderColor: 'rgba(255, 0, 64, 0.5)' },
+                    {
+                        borderColor: 'rgba(252, 238, 9, 0.4)',
+                        duration: 0.3,
+                        yoyo: true,
+                        repeat: 2,
+                        ease: "power2.inOut"
+                    }
+                );
+
+                // 发光效果
+                gsap.fromTo(searchInput,
+                    { boxShadow: '0 0 0 rgba(255, 0, 64, 0)' },
+                    {
+                        boxShadow: '0 0 15px rgba(255, 0, 64, 0.3)',
+                        duration: 0.3,
+                        yoyo: true,
+                        repeat: 2,
+                        ease: "power2.inOut"
+                    }
+                );
+            }
         }
 
         function handleSort(key) {
@@ -2239,6 +2633,20 @@
             if (filteredData.length === 0) {
                 emptyState.style.display = 'block';
                 document.querySelector('table').style.display = 'none';
+
+                // GSAP 空状态浮动动画
+                const emptyIcon = emptyState.querySelector('i');
+                if (emptyIcon) {
+                    gsap.to(emptyIcon, {
+                        y: -10,
+                        scale: 1.04,
+                        opacity: 0.7,
+                        duration: 3,
+                        repeat: -1,
+                        yoyo: true,
+                        ease: "sine.inOut"
+                    });
+                }
             } else {
                 emptyState.style.display = 'none';
                 document.querySelector('table').style.display = 'table';
@@ -2306,17 +2714,17 @@
 
                     tr.innerHTML = `
                         <td data-col="drag">${dragHtml}</td>
-                        <td data-col="name" style="font-weight: 600; color: var(--text-primary);" title="${item.name || '-'}">${item.name || '-'}</td>
-                        <td data-col="priority" style="color: ${priorityColor}; font-weight: 600;">${item.priority || '-'}</td>
-                        <td data-col="category" style="color: var(--text-secondary);">${item.category || '-'}</td>
-                        <td data-col="brand" style="color: var(--text-secondary);">${item.brand || '-'}</td>
-                        <td data-col="quantity" style="color: var(--text-secondary);">${item.quantity || 1}</td>
-                        <td data-col="budgetPrice" title="¥${bPrice.toLocaleString()}">¥${bPrice.toLocaleString()}</td>
-                        <td data-col="actualPrice" style="font-weight: 600;" title="¥${aPrice.toLocaleString()}">¥${aPrice.toLocaleString()} ${isOverBudget ? '<i class="ph-fill ph-warning-circle" style="color: var(--accent-red); margin-left: 4px;"></i>' : ''}</td>
-                        <td data-col="diffPrice" title="¥${diffPrice.toLocaleString()}">${diffHtml}</td>
-                        <td data-col="channel" style="color: var(--text-secondary);">${item.purchaseChannel || '-'}</td>
+                        <td data-col="name" style="font-family: 'Zpix', 'VT323', monospace; font-weight: 600; color: var(--text-primary);" title="${item.name || '-'}">${item.name || '-'}</td>
+                        <td data-col="priority" style="font-family: 'Zpix', 'VT323', monospace; color: ${priorityColor}; font-weight: 600;">${item.priority || '-'}</td>
+                        <td data-col="category" style="font-family: 'Zpix', 'VT323', monospace; color: var(--text-secondary);">${item.category || '-'}</td>
+                        <td data-col="brand" style="font-family: 'Zpix', 'VT323', monospace; color: var(--text-secondary);">${item.brand || '-'}</td>
+                        <td data-col="quantity" style="font-family: 'Zpix', 'VT323', monospace; color: var(--text-secondary);">${item.quantity || 1}</td>
+                        <td data-col="budgetPrice" style="font-family: 'Zpix', 'VT323', monospace;" title="¥${bPrice.toLocaleString()}">¥${bPrice.toLocaleString()}</td>
+                        <td data-col="actualPrice" style="font-family: 'Zpix', 'VT323', monospace; font-weight: 600;" title="¥${aPrice.toLocaleString()}">¥${aPrice.toLocaleString()} ${isOverBudget ? '<i class="ph-fill ph-warning-circle" style="color: var(--accent-red); margin-left: 4px;"></i>' : ''}</td>
+                        <td data-col="diffPrice" style="font-family: 'Zpix', 'VT323', monospace;" title="¥${diffPrice.toLocaleString()}">${diffHtml}</td>
+                        <td data-col="channel" style="font-family: 'Zpix', 'VT323', monospace; color: var(--text-secondary);">${item.purchaseChannel || '-'}</td>
                         <td data-col="status"><span class="status-badge ${statusClass}" title="${item.status}">${item.status}</span></td>
-                        <td data-col="notes" style="color: var(--text-secondary); font-size: 13px; max-width: 200px;">
+                        <td data-col="notes" style="font-family: 'Zpix', 'VT323', monospace; color: var(--text-secondary); font-size: 16px; max-width: 200px;">
                             <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.notes || ''}">
                                 ${item.notes || '-'}
                             </div>
@@ -2345,6 +2753,22 @@
 
                     tbody.appendChild(tr);
                 });
+
+                // GSAP 表格行入场动画 - Cyberpunk Style
+                const rows = tbody.querySelectorAll('tr');
+                if (rows.length > 0) {
+                    gsap.fromTo(rows,
+                        { opacity: 0, x: -20 },
+                        {
+                            opacity: 1,
+                            x: 0,
+                            duration: 0.3,
+                            stagger: 0.03,
+                            ease: "power2.out",
+                            clearProps: "all"
+                        }
+                    );
+                }
             }
 
             // 更新统计面板
@@ -2352,25 +2776,29 @@
             const rate = filteredData.length > 0 ? Math.round((completedCount / filteredData.length) * 100) : 0;
 
             // 数字滚动动画工具函数
-            animateValue(document.getElementById('stat-budget'), totalBudget);
-            animateValue(document.getElementById('stat-actual'), totalActual);
-
+            const budgetEl = document.getElementById('stat-budget');
+            const actualEl = document.getElementById('stat-actual');
             const diffEl = document.getElementById('stat-diff');
+            const rateEl = document.getElementById('stat-rate');
             const cardDiff = document.getElementById('card-diff');
-            animateValue(diffEl, diff, true);
 
-            if (diff < 0) {
-                cardDiff.className = 'stat-card card-red over-budget';
-                document.getElementById('stat-diff-sub').innerText = '已超出预算，请注意控制';
-            } else if (diff > 0) {
-                cardDiff.className = 'stat-card card-green positive';
-                document.getElementById('stat-diff-sub').innerText = '预算内，状况良好';
-            } else {
-                cardDiff.className = 'stat-card card-green';
-                document.getElementById('stat-diff-sub').innerText = '预算与实际持平';
+            if (budgetEl) animateValue(budgetEl, totalBudget);
+            if (actualEl) animateValue(actualEl, totalActual);
+            if (diffEl) animateValue(diffEl, diff, true);
+            if (rateEl) rateEl.innerText = rate + '%';
+
+            if (cardDiff) {
+                if (diff < 0) {
+                    cardDiff.className = 'stat-card card-red over-budget';
+                    document.getElementById('stat-diff-sub').innerText = '已超出预算，请注意控制';
+                } else if (diff > 0) {
+                    cardDiff.className = 'stat-card card-green positive';
+                    document.getElementById('stat-diff-sub').innerText = '预算内，状况良好';
+                } else {
+                    cardDiff.className = 'stat-card card-green';
+                    document.getElementById('stat-diff-sub').innerText = '预算与实际持平';
+                }
             }
-
-            document.getElementById('stat-rate').innerText = rate + '%';
 
             // 总体超预算卡片高亮
             const cardActual = document.getElementById('card-actual');
@@ -2589,39 +3017,65 @@
             });
         }
 
-        // 数字增长动画（增强版：弹性回弹 + 数字 pop 动效）
+        // 数字增长动画（GSAP 版：霓虹发光 + 弹性回弹）
         function animateValue(obj, end, isDiff = false) {
-            const duration = 700;
-            const start = Number(obj.innerText.replace(/[^0-9.-]+/g,"")) || 0;
-            if (start === end) return;
+            if (!obj) return;
 
-            const range = end - start;
-            let startTime = null;
+            // 四舍五入到两位小数，避免浮点数精度问题
+            const roundedEnd = Math.round(end * 100) / 100;
+            const start = Number(obj.innerText.replace(/[^0-9.-]+/g, "")) || 0;
 
-            // 触发数字弹跳动效
-            obj.classList.remove('value-pop');
-            void obj.offsetWidth; // reflow
-            obj.classList.add('value-pop');
-
-            const step = (timestamp) => {
-                if (!startTime) startTime = timestamp;
-                const progress = Math.min((timestamp - startTime) / duration, 1);
-                // Ease out back: 略微超过终点再回弹，增强弹性感
-                const c1 = 1.70158;
-                const c3 = c1 + 1;
-                const easeProgress = 1 + c3 * Math.pow(progress - 1, 3) + c1 * Math.pow(progress - 1, 2);
-
-                let currentVal = Math.floor(start + (range * easeProgress));
-                if (progress === 1) currentVal = end;
-
-                obj.innerText = (isDiff && currentVal > 0 ? '+' : '') + currentVal.toLocaleString();
-
-                if (progress < 1) window.requestAnimationFrame(step);
+            // 判断是否为小数（金额）
+            const hasDecimal = roundedEnd % 1 !== 0;
+            const formatValue = (val) => {
+                const rounded = Math.round(val * 100) / 100;
+                return (isDiff && rounded > 0 ? '+' : '') + rounded.toLocaleString('zh-CN', {
+                    minimumFractionDigits: hasDecimal ? 2 : 0,
+                    maximumFractionDigits: 2
+                });
             };
-            window.requestAnimationFrame(step);
+
+            // 立即设置最终值（确保显示正确）
+            obj.innerText = formatValue(roundedEnd);
+
+            // 如果值相同或 GSAP 不可用，不执行动画
+            if (Math.abs(start - roundedEnd) < 0.01 || typeof gsap === 'undefined') return;
+
+            try {
+                const counter = { value: start };
+
+                // 数字滚动动画
+                gsap.to(counter, {
+                    value: roundedEnd,
+                    duration: 0.8,
+                    ease: "power3.out",
+                    onUpdate: () => {
+                        obj.innerText = formatValue(counter.value);
+                    },
+                    onComplete: () => {
+                        // 确保最终值正确
+                        obj.innerText = formatValue(roundedEnd);
+                    }
+                });
+
+                // 霓虹发光弹跳效果
+                gsap.fromTo(obj,
+                    { scale: 1, textShadow: '0 0 0 rgba(252, 238, 9, 0)' },
+                    {
+                        scale: 1.08,
+                        textShadow: '0 0 20px rgba(252, 238, 9, 0.6)',
+                        duration: 0.2,
+                        yoyo: true,
+                        repeat: 1,
+                        ease: "power2.out"
+                    }
+                );
+            } catch (e) {
+                console.warn('GSAP animation error:', e);
+            }
         }
 
-        // Toast 通知
+        // Toast 通知（GSAP 版 - Cyberpunk Style）
         function showToast(message, type = 'info', duration = 3000) {
             const container = document.getElementById('toast-container');
             const icons = { success: 'ph-check-circle', error: 'ph-warning-circle', info: 'ph-info' };
@@ -2632,25 +3086,52 @@
             toast.innerHTML = `<i class="ph ${icon}"></i><span>${message}</span>`;
             container.appendChild(toast);
 
-            // 触发入场动画
-            requestAnimationFrame(() => {
-                toast.classList.add('show');
-            });
+            // 入场动画 - 滑入 + 发光
+            gsap.fromTo(toast,
+                { x: 120, opacity: 0, scale: 0.8 },
+                {
+                    x: 0,
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.5,
+                    ease: "back.out(1.5)"
+                }
+            );
+
+            // 发光闪烁效果
+            const glowColors = {
+                success: 'rgba(0, 255, 136, 0.3)',
+                error: 'rgba(255, 0, 64, 0.3)',
+                info: 'rgba(0, 240, 255, 0.3)'
+            };
+
+            gsap.fromTo(toast,
+                { boxShadow: `0 0 0 ${glowColors[type] || glowColors.info}` },
+                {
+                    boxShadow: `0 0 25px ${glowColors[type] || glowColors.info}`,
+                    duration: 0.3,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power2.inOut"
+                }
+            );
 
             // 自动移除
-            setTimeout(() => {
-                toast.classList.remove('show');
-                toast.classList.add('hide');
-                setTimeout(() => {
-                    if (toast.parentNode) toast.parentNode.removeChild(toast);
-                }, 400);
-            }, duration);
+            gsap.to(toast, {
+                x: 120,
+                opacity: 0,
+                scale: 0.8,
+                duration: 0.4,
+                delay: duration / 1000,
+                ease: "power3.in",
+                onComplete: () => toast.remove()
+            });
         }
 
-        // 涟漪点击反馈
+        // 涟漪点击反馈（GSAP 版 - Cyberpunk Neon）
         function initRipple() {
             document.querySelectorAll('.btn').forEach(btn => {
-                // 跳过已有 ripper-container 的按钮
+                // 跳过已有 ripple-container 的按钮
                 if (btn.querySelector('.ripple-container')) return;
 
                 const container = document.createElement('span');
@@ -2669,10 +3150,33 @@
                     ripple.style.left = x + 'px';
                     ripple.style.top = y + 'px';
 
+                    // 添加霓虹发光效果
+                    ripple.style.boxShadow = '0 0 15px rgba(252, 238, 9, 0.5), 0 0 30px rgba(252, 238, 9, 0.3)';
+
                     container.appendChild(ripple);
-                    ripple.addEventListener('animationend', () => {
-                        ripple.remove();
-                    });
+
+                    gsap.fromTo(ripple,
+                        { scale: 0, opacity: 0.8 },
+                        {
+                            scale: 4,
+                            opacity: 0,
+                            duration: 0.7,
+                            ease: "power2.out",
+                            onComplete: () => ripple.remove()
+                        }
+                    );
+
+                    // 按钮发光效果
+                    gsap.fromTo(btn,
+                        { boxShadow: '0 0 0 rgba(252, 238, 9, 0)' },
+                        {
+                            boxShadow: '0 0 20px rgba(252, 238, 9, 0.3)',
+                            duration: 0.2,
+                            yoyo: true,
+                            repeat: 1,
+                            ease: "power2.inOut"
+                        }
+                    );
                 });
             });
         }
@@ -2682,14 +3186,60 @@
             document.body.classList.add('modal-open');
             const jsonStr = JSON.stringify(appliances, null, 4);
             document.getElementById('json-textarea').value = jsonStr;
-            document.getElementById('jsonModalOverlay').classList.add('active');
+            const overlay = document.getElementById('jsonModalOverlay');
+            overlay.classList.add('active');
+
+            // GSAP 入场动画 - Cyberpunk Style
+            const modalContent = overlay.querySelector('.modal');
+            gsap.fromTo(overlay,
+                { opacity: 0 },
+                { opacity: 1, duration: 0.3 }
+            );
+            gsap.fromTo(modalContent,
+                { scale: 0.9, y: 30, opacity: 0 },
+                {
+                    scale: 1,
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.5,
+                    ease: "back.out(1.5)"
+                }
+            );
+
+            // 发光效果
+            gsap.fromTo(modalContent,
+                { boxShadow: '0 0 0 rgba(252, 238, 9, 0)' },
+                {
+                    boxShadow: '0 0 40px rgba(252, 238, 9, 0.3), 0 0 80px rgba(252, 238, 9, 0.1)',
+                    duration: 0.6,
+                    ease: "power2.out"
+                }
+            );
         }
 
         function closeJsonModal() {
-            document.getElementById('jsonModalOverlay').classList.remove('active');
-            if (!document.querySelector('.modal-overlay.active')) {
-                document.body.classList.remove('modal-open');
-            }
+            const overlay = document.getElementById('jsonModalOverlay');
+            const modalContent = overlay.querySelector('.modal');
+
+            // GSAP 出场动画
+            gsap.to(modalContent, {
+                scale: 0.9,
+                y: 30,
+                opacity: 0,
+                duration: 0.3,
+                ease: "power3.in"
+            });
+            gsap.to(overlay, {
+                opacity: 0,
+                duration: 0.3,
+                onComplete: () => {
+                    overlay.classList.remove('active');
+                    gsap.set(modalContent, { clearProps: "all" });
+                    if (!document.querySelector('.modal-overlay.active')) {
+                        document.body.classList.remove('modal-open');
+                    }
+                }
+            });
         }
 
         function copyJsonData() {
@@ -2758,10 +3308,55 @@
                 document.getElementById('form-status').value = '待购';
             }
             modal.classList.add('active');
+
+            // GSAP 入场动画 - Cyberpunk Style
+            const modalContent = modal.querySelector('.modal');
+            gsap.fromTo(modal,
+                { opacity: 0 },
+                { opacity: 1, duration: 0.3 }
+            );
+            gsap.fromTo(modalContent,
+                { scale: 0.9, y: 30, opacity: 0 },
+                {
+                    scale: 1,
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.5,
+                    ease: "back.out(1.5)"
+                }
+            );
+
+            // 发光效果
+            gsap.fromTo(modalContent,
+                { boxShadow: '0 0 0 rgba(252, 238, 9, 0)' },
+                {
+                    boxShadow: '0 0 40px rgba(252, 238, 9, 0.3), 0 0 80px rgba(252, 238, 9, 0.1)',
+                    duration: 0.6,
+                    ease: "power2.out"
+                }
+            );
         }
 
         function closeModal() {
-            modal.classList.remove('active');
+            const modalContent = modal.querySelector('.modal');
+
+            // GSAP 出场动画
+            gsap.to(modalContent, {
+                scale: 0.9,
+                y: 30,
+                opacity: 0,
+                duration: 0.3,
+                ease: "power3.in"
+            });
+            gsap.to(modal, {
+                opacity: 0,
+                duration: 0.3,
+                onComplete: () => {
+                    modal.classList.remove('active');
+                    // 重置样式
+                    gsap.set(modalContent, { clearProps: "all" });
+                }
+            });
         }
 
         function saveData() {
@@ -2809,17 +3404,38 @@
         function deleteData(id) {
             if (!confirm('确定要删除该项目吗？此操作不可恢复。')) return;
 
-            // 尝试找到对应行，添加离开动画
+            // 尝试找到对应行，添加 GSAP 离开动画 - Cyberpunk Style
             const tbody = document.getElementById('table-body');
             const row = tbody.querySelector(`tr[data-id="${id}"]`);
             if (row) {
-                row.classList.add('row-leave');
-                // 等待离开动画完成后删除数据并重新渲染
-                setTimeout(() => {
-                    appliances = appliances.filter(a => a.id !== id);
-                    applyFiltersAndSort();
-                    showToast('项目已删除', 'error');
-                }, 320);
+                // 红色闪烁效果
+                gsap.fromTo(row,
+                    { backgroundColor: 'transparent' },
+                    {
+                        backgroundColor: 'rgba(255, 0, 64, 0.2)',
+                        duration: 0.15,
+                        yoyo: true,
+                        repeat: 3,
+                        ease: "power2.inOut"
+                    }
+                );
+
+                // 消失动画
+                gsap.to(row, {
+                    opacity: 0,
+                    x: -50,
+                    scale: 0.95,
+                    maxHeight: 0,
+                    padding: 0,
+                    duration: 0.4,
+                    delay: 0.5,
+                    ease: "power3.in",
+                    onComplete: () => {
+                        appliances = appliances.filter(a => a.id !== id);
+                        applyFiltersAndSort();
+                        showToast('项目已删除', 'error');
+                    }
+                });
             } else {
                 appliances = appliances.filter(a => a.id !== id);
                 applyFiltersAndSort();
@@ -3486,6 +4102,86 @@
             const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             XLSX.writeFile(wb, `装修预算_${dateStr}.xlsx`);
         }
+
+        // ============================================================
+        // 颜色选择器 — 自定义主题色
+        // ============================================================
+        function toggleColorPicker() {
+            const panel = document.getElementById('colorPickerPanel');
+            panel.classList.toggle('show');
+            // 点击外部关闭
+            if (panel.classList.contains('show')) {
+                setTimeout(() => {
+                    document.addEventListener('click', closeColorPickerOutside);
+                }, 0);
+            } else {
+                document.removeEventListener('click', closeColorPickerOutside);
+            }
+        }
+
+        function closeColorPickerOutside(e) {
+            const wrapper = document.querySelector('.color-picker-wrapper');
+            if (!wrapper.contains(e.target)) {
+                document.getElementById('colorPickerPanel').classList.remove('show');
+                document.removeEventListener('click', closeColorPickerOutside);
+            }
+        }
+
+        function applyThemeColor(hex) {
+            const root = document.documentElement;
+            // 主色
+            root.style.setProperty('--accent-purple', hex);
+            root.style.setProperty('--accent-yellow', hex);
+            // 亮色变体
+            const lighter = lightenColor(hex, 40);
+            const darker = darkenColor(hex, 30);
+            root.style.setProperty('--accent-purple-light', lighter);
+            root.style.setProperty('--accent-purple-dark', darker);
+            // 发光效果
+            root.style.setProperty('--glow-purple', `0 0 10px ${hex}80, 0 0 20px ${hex}4D`);
+            root.style.setProperty('--glow-purple-intense', `0 0 15px ${hex}B3, 0 0 30px ${hex}66, 0 0 45px ${hex}33`);
+            // 边框
+            root.style.setProperty('--card-border', `${hex}4D`);
+            root.style.setProperty('--card-border-hover', `${hex}99`);
+            root.style.setProperty('--input-border', `${hex}66`);
+            // 更新预设色高亮
+            document.querySelectorAll('.color-swatch').forEach(s => {
+                s.classList.toggle('active', s.dataset.color === hex);
+            });
+            // 更新自定义颜色输入
+            document.getElementById('customColorInput').value = hex;
+            // 保存到 localStorage
+            localStorage.setItem('theme-accent', hex);
+        }
+
+        function lightenColor(hex, percent) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const r = Math.min(255, (num >> 16) + Math.round(255 * percent / 100));
+            const g = Math.min(255, ((num >> 8) & 0x00FF) + Math.round(255 * percent / 100));
+            const b = Math.min(255, (num & 0x0000FF) + Math.round(255 * percent / 100));
+            return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
+        }
+
+        function darkenColor(hex, percent) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const r = Math.max(0, (num >> 16) - Math.round(255 * percent / 100));
+            const g = Math.max(0, ((num >> 8) & 0x00FF) - Math.round(255 * percent / 100));
+            const b = Math.max(0, (num & 0x0000FF) - Math.round(255 * percent / 100));
+            return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
+        }
+
+        // 预设色点击事件
+        document.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', () => {
+                applyThemeColor(swatch.dataset.color);
+            });
+        });
+
+        // 恢复保存的主题色
+        (function restoreThemeColor() {
+            const saved = localStorage.getItem('theme-accent');
+            if (saved) applyThemeColor(saved);
+        })();
 
         // --- 初始化启动 ---
         window.onload = init;

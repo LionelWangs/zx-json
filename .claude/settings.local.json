@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout:*)",
+      "Bash(node:*)",
+      "Bash(claude mcp:*)",
+      "WebFetch(domain:pixso.cn)",
+      "mcp__remote-pixso__get_local_styles",
+      "mcp__remote-pixso__get_variable_sets",
+      "mcp__remote-pixso__get_node_dsl",
+      "Bash(python3 -c ':*)",
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "mcp__ide__getDiagnostics",
+      "WebSearch"
+    ]
+  }
+}
