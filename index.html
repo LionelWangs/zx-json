@@ -3355,6 +3355,9 @@
                     modal.classList.remove('active');
                     // 重置样式
                     gsap.set(modalContent, { clearProps: "all" });
+                    if (!document.querySelector('.modal-overlay.active')) {
+                        document.body.classList.remove('modal-open');
+                    }
                 }
             });
         }
