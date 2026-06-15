@@ -1,0 +1,96 @@
+<h2>明细清单表格样式</h2>
+<p class="subtitle">数据行的视觉呈现方式</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>极简无框线</h3>
+      <p>去掉所有网格线，仅用底部细线分隔行。交替行用极淡灰色底色区分。视觉上最干净，接近 Apple 官网产品表。</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-body" style="padding:16px;background:#0a0a0a;color:#f5f5f7;font-family:-apple-system,sans-serif">
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="border-bottom:2px solid rgba(255,255,255,0.12)">
+                <th style="padding:10px 8px;text-align:left;color:#86868b;font-weight:500;font-size:11px">名称</th>
+                <th style="padding:10px 8px;text-align:center;color:#86868b;font-weight:500;font-size:11px">分类</th>
+                <th style="padding:10px 8px;text-align:right;color:#86868b;font-weight:500;font-size:11px">预算</th>
+                <th style="padding:10px 8px;text-align:right;color:#86868b;font-weight:500;font-size:11px">实际</th>
+                <th style="padding:10px 8px;text-align:center;color:#86868b;font-weight:500;font-size:11px">状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
+                <td style="padding:14px 8px;font-weight:500">海尔冰箱 BCD-500</td>
+                <td style="padding:14px 8px;text-align:center;color:#86868b">家电</td>
+                <td style="padding:14px 8px;text-align:right">¥5,999</td>
+                <td style="padding:14px 8px;text-align:right;color:#0a84ff">¥5,499</td>
+                <td style="padding:14px 8px;text-align:center"><span style="background:rgba(48,209,88,0.15);color:#30d158;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500">完成</span></td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02)">
+                <td style="padding:14px 8px;font-weight:500">全屋定制柜</td>
+                <td style="padding:14px 8px;text-align:center;color:#86868b">硬装</td>
+                <td style="padding:14px 8px;text-align:right">¥28,000</td>
+                <td style="padding:14px 8px;text-align:right;color:#ff453a">¥32,500</td>
+                <td style="padding:14px 8px;text-align:center"><span style="background:rgba(255,159,10,0.15);color:#ff9f0a;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500">付款</span></td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
+                <td style="padding:14px 8px;font-weight:500">智能马桶</td>
+                <td style="padding:14px 8px;text-align:center;color:#86868b">家电</td>
+                <td style="padding:14px 8px;text-align:right">¥3,200</td>
+                <td style="padding:14px 8px;text-align:right;color:#86868b">—</td>
+                <td style="padding:14px 8px;text-align:center"><span style="background:rgba(10,132,255,0.15);color:#0a84ff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500">待购</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>轻框线 + 色块标签</h3>
+      <p>保留极细网格线保证可读性，状态/优先度用圆角色块标签展示。平衡美观与实用，Excel 中最常见的专业做法。</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-body" style="padding:16px;background:#0a0a0a;color:#f5f5f7;font-family:-apple-system,sans-serif">
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="background:rgba(28,28,30,0.8)">
+                <th style="padding:10px 8px;text-align:left;color:#f5f5f7;font-weight:600;font-size:11px;border:1px solid rgba(255,255,255,0.06)">名称</th>
+                <th style="padding:10px 8px;text-align:center;color:#f5f5f7;font-weight:600;font-size:11px;border:1px solid rgba(255,255,255,0.06)">分类</th>
+                <th style="padding:10px 8px;text-align:right;color:#f5f5f7;font-weight:600;font-size:11px;border:1px solid rgba(255,255,255,0.06)">预算</th>
+                <th style="padding:10px 8px;text-align:right;color:#f5f5f7;font-weight:600;font-size:11px;border:1px solid rgba(255,255,255,0.06)">实际</th>
+                <th style="padding:10px 8px;text-align:center;color:#f5f5f7;font-weight:600;font-size:11px;border:1px solid rgba(255,255,255,0.06)">状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:12px 8px;border:1px solid rgba(255,255,255,0.04);font-weight:500">海尔冰箱 BCD-500</td>
+                <td style="padding:12px 8px;text-align:center;border:1px solid rgba(255,255,255,0.04);color:#86868b">家电</td>
+                <td style="padding:12px 8px;text-align:right;border:1px solid rgba(255,255,255,0.04)">¥5,999</td>
+                <td style="padding:12px 8px;text-align:right;border:1px solid rgba(255,255,255,0.04);color:#0a84ff;font-weight:600">¥5,499</td>
+                <td style="padding:12px 8px;text-align:center;border:1px solid rgba(255,255,255,0.04);background:rgba(48,209,88,0.08);color:#30d158;font-weight:600">完成</td>
+              </tr>
+              <tr style="background:rgba(255,255,255,0.015)">
+                <td style="padding:12px 8px;border:1px solid rgba(255,255,255,0.04);font-weight:500">全屋定制柜</td>
+                <td style="padding:12px 8px;text-align:center;border:1px solid rgba(255,255,255,0.04);color:#86868b">硬装</td>
+                <td style="padding:12px 8px;text-align:right;border:1px solid rgba(255,255,255,0.04)">¥28,000</td>
+                <td style="padding:12px 8px;text-align:right;border:1px solid rgba(255,255,255,0.04);color:#ff453a;font-weight:600">¥32,500</td>
+                <td style="padding:12px 8px;text-align:center;border:1px solid rgba(255,255,255,0.04);background:rgba(255,159,10,0.08);color:#ff9f0a;font-weight:600">付款</td>
+              </tr>
+              <tr>
+                <td style="padding:12px 8px;border:1px solid rgba(255,255,255,0.04);font-weight:500">智能马桶</td>
+                <td style="padding:12px 8px;text-align:center;border:1px solid rgba(255,255,255,0.04);color:#86868b">家电</td>
+                <td style="padding:12px 8px;text-align:right;border:1px solid rgba(255,255,255,0.04)">¥3,200</td>
+                <td style="padding:12px 8px;text-align:right;border:1px solid rgba(255,255,255,0.04);color:#86868b">—</td>
+                <td style="padding:12px 8px;text-align:center;border:1px solid rgba(255,255,255,0.04);background:rgba(10,132,255,0.08);color:#0a84ff;font-weight:600">待购</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

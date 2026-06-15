@@ -3831,278 +3831,522 @@
             reader.readAsText(file);
         }
 
-        // --- 6. 高级 Excel 导出 (保持样式) ---
+        // --- 6. Apple 风格 Excel 导出 (全面重构) ---
         function exportExcel() {
-            // 使用当前视图的数据（即支持导出过滤和排序后的结果）
+            // 使用当前视图的数据（支持导出过滤和排序后的结果）
             const dataToExport = filteredData.length > 0 || currentFilter !== 'all' || currentSearch !== '' ? filteredData : appliances;
 
             if (dataToExport.length === 0) {
                 return alert('没有可导出的数据！');
             }
 
-            // 1. 获取全局统计数据
+            // ========== 1. 数据准备 ==========
             const stats = calculateStatistics(dataToExport);
-
-            // 2. 构造二维数组 (AOA)
-            const aoa = [];
-            
-            // --- A. 添加全局总计汇总区域 ---
-            aoa.push(["【总计汇总】"]);
-            aoa.push(["总预算(¥)", "实际支出(¥)", "预算差额(¥)", "完成率(%)", "总项目数"]);
             const completionRate = dataToExport.length > 0 ? Math.round((stats.completedCount / dataToExport.length) * 100) : 0;
             const diffPrice = stats.totalBudget - stats.totalActual;
-            aoa.push([
-                stats.totalBudget, 
-                stats.totalActual, 
-                diffPrice > 0 ? `+${diffPrice}` : diffPrice, 
-                `${completionRate}%`, 
-                dataToExport.length
-            ]);
-            aoa.push([]); // 空行分隔
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-            // --- B. 添加分类汇总区域 ---
-            aoa.push(["【分类汇总】"]);
-            aoa.push(["分类", "总预算(¥)", "实际支出(¥)", "完成度", "项目数"]);
-            Object.keys(stats.categoryStats).forEach(cat => {
-                const cStats = stats.categoryStats[cat];
+            // 货币格式化（千分位 + ¥）
+            const fmtCurrency = (v) => {
+                const n = Number(v) || 0;
+                return '¥' + n.toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            };
+
+            // 进度条字符生成（Unicode 实心/空心方块）
+            const fmtProgress = (pct) => {
+                const filled = Math.round(pct / 10);
+                const empty = 10 - filled;
+                return '█'.repeat(filled) + '░'.repeat(empty) + ' ' + pct + '%';
+            };
+
+            // ========== 2. 构造 AOA 二维数组 ==========
+            const aoa = [];
+            const rowMap = {}; // 记录各区域起始行索引
+
+            // --- Row 0: 标题行 ---
+            rowMap.title = aoa.length;
+            aoa.push([`装修预算清单  |  导出日期：${dateStr}`]);
+
+            // --- Row 1: 空行 ---
+            aoa.push([]);
+
+            // --- Row 2-3: 卡片汇总区（2行×11列，每卡片占约3列宽） ---
+            rowMap.cardLabel = aoa.length;
+            aoa.push(['总预算', '', '', '实际支出', '', '', '预算差额', '', '', '完成率', '']);
+            rowMap.cardValue = aoa.length;
+            const diffStr = diffPrice > 0 ? `+${fmtCurrency(diffPrice)}` : fmtCurrency(diffPrice);
+            aoa.push([fmtCurrency(stats.totalBudget), '', '', fmtCurrency(stats.totalActual), '', '', diffStr, '', '', `${completionRate}%`, '']);
+
+            // --- Row 4: 空行 ---
+            aoa.push([]);
+
+            // --- Row 5: 分类汇总标题 ---
+            rowMap.catTitle = aoa.length;
+            aoa.push(['分类汇总']);
+
+            // --- Row 6: 分类汇总表头 ---
+            rowMap.catHeader = aoa.length;
+            aoa.push(['分类', '总预算', '实际支出', '完成进度', '项目数', '', '', '', '', '', '']);
+
+            // --- Row 7+: 分类数据行 ---
+            rowMap.catDataStart = aoa.length;
+            const catKeys = Object.keys(stats.categoryStats);
+            catKeys.forEach(cat => {
+                const cs = stats.categoryStats[cat];
+                const catRate = cs.itemCount > 0 ? Math.round((cs.completedCount / cs.itemCount) * 100) : 0;
                 aoa.push([
                     cat,
-                    cStats.totalBudget,
-                    cStats.totalActual,
-                    `${cStats.completedCount} / ${cStats.itemCount}`,
-                    cStats.itemCount
-                ]);
-            });
-            aoa.push([]); // 空行分隔
-
-            // --- C. 添加明细数据区域 ---
-            aoa.push(["【预算明细清单】"]);
-            const detailStartRowIndex = aoa.length; // 记录明细数据表头的所在行索引（从0开始）
-            const headers = ["名称", "优先度", "分类", "品牌", "数量", "预算金额(¥)", "实际金额(¥)", "差额(¥)", "购买渠道", "状态", "备注"];
-            aoa.push(headers);
-
-            dataToExport.forEach(item => {
-                const bPrice = Number(item.budgetPrice) || 0;
-                const aPrice = Number(item.actualPrice) || 0;
-                const itemDiffPrice = item.status === '待购' ? '-' : (bPrice - aPrice);
-
-                aoa.push([
-                    item.name || '',
-                    item.priority || '',
-                    item.category || '',
-                    item.brand || '',
-                    item.quantity || 1,
-                    bPrice,
-                    aPrice,
-                    itemDiffPrice,
-                    item.purchaseChannel || '',
-                    item.status || '',
-                    item.notes || ''
+                    fmtCurrency(cs.totalBudget),
+                    fmtCurrency(cs.totalActual),
+                    fmtProgress(catRate),
+                    `${cs.completedCount} / ${cs.itemCount}`,
+                    '', '', '', '', '', ''
                 ]);
             });
 
-            // 3. 创建工作簿和工作表
+            // --- 空行分隔 ---
+            aoa.push([]);
+
+            // --- 明细清单标题 ---
+            rowMap.detailTitle = aoa.length;
+            aoa.push(['预算明细清单']);
+
+            // --- 明细表头 ---
+            rowMap.detailHeader = aoa.length;
+            aoa.push(['名称', '优先度', '分类', '品牌', '数量', '预算金额', '实际金额', '差额', '购买渠道', '状态', '备注']);
+
+            // --- 明细数据行（按分类分组） ---
+            rowMap.detailDataStart = aoa.length;
+            const detailRowMap = []; // 行索引映射：{ type, index?, category? }
+
+            catKeys.forEach(cat => {
+                // 分类分组标题行
+                const headerRowIdx = aoa.length;
+                aoa.push([`${cat}`, '', '', '', '', '', '', '', '', '', '']);
+                detailRowMap.push({ row: headerRowIdx, type: 'groupHeader', category: cat });
+
+                // 该分类下的所有项目
+                const catItems = dataToExport.filter(item => (item.category || '未分类') === cat);
+                catItems.forEach((item, localIdx) => {
+                    const bPrice = Number(item.budgetPrice) || 0;
+                    const aPrice = Number(item.actualPrice) || 0;
+                    const itemDiff = item.status === '待购' ? '-' : (bPrice - aPrice);
+                    const dataRowIdx = aoa.length;
+                    aoa.push([
+                        item.name || '',
+                        item.priority || '',
+                        item.category || '',
+                        item.brand || '',
+                        item.quantity || 1,
+                        bPrice,
+                        aPrice,
+                        itemDiff,
+                        item.purchaseChannel || '',
+                        item.status || '',
+                        item.notes || ''
+                    ]);
+                    detailRowMap.push({ row: dataRowIdx, type: 'data', item, localIndex: localIdx });
+                });
+            });
+
+            // ========== 3. 创建工作簿和工作表 ==========
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(aoa);
+            const range = XLSX.utils.decode_range(ws['!ref']);
 
-            // 4. 样式定义
-            const borderStyle = {
+            // ========== 4. 样式工厂 ==========
+            // 边框定义
+            const thinBorder = { // 细边框（清晰可见）
                 top: { style: "thin", color: { rgb: "D1D1D6" } },
                 bottom: { style: "thin", color: { rgb: "D1D1D6" } },
                 left: { style: "thin", color: { rgb: "D1D1D6" } },
                 right: { style: "thin", color: { rgb: "D1D1D6" } }
             };
+            const noBorder = {}; // 无边框
+            const bottomThin = { bottom: { style: "thin", color: { rgb: "D1D1D6" } } }; // 仅底部细线
 
-            const headerStyle = {
-                font: { bold: true, color: { rgb: "FFFFFF" }, sz: 12, name: "Arial" },
-                fill: { fgColor: { rgb: "1C1C1E" } }, // 暗色表头
-                alignment: { horizontal: "center", vertical: "center" },
-                border: borderStyle
-            };
+            // 快捷样式生成器（避免 JSON 深拷贝的性能开销）
+            const S = (overrides = {}) => ({
+                font: { name: "Arial", sz: 11, color: { rgb: "1D1D1F" }, ...overrides.font },
+                fill: overrides.fill ? { fgColor: { rgb: overrides.fill } } : undefined,
+                alignment: { vertical: "center", ...overrides.alignment },
+                border: overrides.border || noBorder,
+                ...(overrides.numFmt ? { numFmt: overrides.numFmt } : {})
+            });
 
-            const titleStyle = {
-                font: { bold: true, color: { rgb: "1D1D1F" }, sz: 14, name: "Arial" },
-                alignment: { horizontal: "left", vertical: "center" }
-            };
-
-            const summaryHeaderStyle = {
-                font: { bold: true, color: { rgb: "1D1D1F" }, sz: 11, name: "Arial" },
-                fill: { fgColor: { rgb: "F2F2F7" } }, // 浅灰底色
-                alignment: { horizontal: "center", vertical: "center" },
-                border: borderStyle
-            };
-
-            const baseStyle = {
-                font: { sz: 11, color: { rgb: "1D1D1F" }, name: "Arial" },
-                alignment: { vertical: "center", horizontal: "center" },
-                border: borderStyle
-            };
-
-            // 获取有效范围
-            const range = XLSX.utils.decode_range(ws['!ref']);
-
-            // 行高配置
-            ws['!rows'] = [];
-
-            // 合并标题单元格
-            ws['!merges'] = [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }, // 总计汇总标题
-                { s: { r: 4, c: 0 }, e: { r: 4, c: 4 } }, // 分类汇总标题
-                { s: { r: detailStartRowIndex - 1, c: 0 }, e: { r: detailStartRowIndex - 1, c: 10 } } // 明细清单标题
+            // 分类调色板（循环使用）
+            const catPalette = [
+                { accent: "0A84FF", bg: "EBF5FF", name: "blue" },   // 蓝
+                { accent: "30D158", bg: "E8F8EE", name: "green" },  // 绿
+                { accent: "FF9F0A", bg: "FFF5E6", name: "orange" }, // 橙
+                { accent: "BF5AF2", bg: "F5EBFF", name: "purple" }, // 紫
+                { accent: "FF375F", bg: "FFECEF", name: "pink" },   // 粉
+                { accent: "64D2FF", bg: "E6F7FF", name: "teal" }    // 青
             ];
 
-            // 5. 遍历所有单元格应用样式
-            for (let R = range.s.r; R <= range.e.r; ++R) {
-                // 设置行高：标题和表头高一点
-                if (R === 0 || R === 4 || R === detailStartRowIndex - 1) {
-                    ws['!rows'][R] = { hpx: 35 }; // 大标题
-                } else if (R === 1 || R === 5 || R === detailStartRowIndex) {
-                    ws['!rows'][R] = { hpx: 30 }; // 表头
-                } else if (aoa[R].length > 0) {
-                    ws['!rows'][R] = { hpx: 40 }; // 数据行
-                }
+            // 预定义样式
+            const styles = {
+                // 标题
+                title: S({ font: { bold: true, sz: 16, color: { rgb: "1D1D1F" } }, alignment: { horizontal: "left" } }),
 
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    const cellAddress = {c: C, r: R};
-                    const cellRef = XLSX.utils.encode_cell(cellAddress);
-                    
-                    // 如果该行是空行，跳过样式设置
-                    if (aoa[R].length === 0) continue;
-                    
-                    if (!ws[cellRef]) ws[cellRef] = { t: 's', v: '' }; // 填充空单元格
+                // 卡片标签（上方）— 每张卡片独立底色
+                cardLabelBlue: S({
+                    font: { sz: 10, color: { rgb: "0A84FF" }, bold: true },
+                    fill: "EBF5FF",
+                    alignment: { horizontal: "center" },
+                    border: { ...thinBorder, top: { style: "thin", color: { rgb: "B8D9FF" } } }
+                }),
+                cardLabelGreen: S({
+                    font: { sz: 10, color: { rgb: "30D158" }, bold: true },
+                    fill: "E8F8EE",
+                    alignment: { horizontal: "center" },
+                    border: { ...thinBorder, top: { style: "thin", color: { rgb: "B8EDCA" } } }
+                }),
+                cardLabelOrange: S({
+                    font: { sz: 10, color: { rgb: "FF9F0A" }, bold: true },
+                    fill: "FFF5E6",
+                    alignment: { horizontal: "center" },
+                    border: { ...thinBorder, top: { style: "thin", color: { rgb: "FFD9A0" } } }
+                }),
+                cardLabelRed: S({
+                    font: { sz: 10, color: { rgb: "FF453A" }, bold: true },
+                    fill: "FFECEF",
+                    alignment: { horizontal: "center" },
+                    border: { ...thinBorder, top: { style: "thin", color: { rgb: "FFC0C0" } } }
+                }),
+                // 卡片数值（下方）— 每张卡片独立底色
+                cardValue: S({
+                    font: { bold: true, sz: 14, color: { rgb: "1D1D1F" } },
+                    fill: "EBF5FF",
+                    alignment: { horizontal: "center" },
+                    border: { ...thinBorder, bottom: { style: "thin", color: { rgb: "B8D9FF" } } }
+                }),
+                // 卡片数值 — 蓝色（实际支出）
+                cardValueBlue: S({
+                    font: { bold: true, sz: 14, color: { rgb: "0A84FF" } },
+                    fill: "EBF5FF",
+                    alignment: { horizontal: "center" },
+                    border: { ...thinBorder, bottom: { style: "thin", color: { rgb: "B8D9FF" } } }
+                }),
+                // 卡片数值 — 绿色（正差额）
+                cardValueGreen: S({
+                    font: { bold: true, sz: 14, color: { rgb: "30D158" } },
+                    fill: "E8F8EE",
+                    alignment: { horizontal: "center" },
+                    border: { ...thinBorder, bottom: { style: "thin", color: { rgb: "B8EDCA" } } }
+                }),
+                // 卡片数值 — 红色（负差额）
+                cardValueRed: S({
+                    font: { bold: true, sz: 14, color: { rgb: "FF453A" } },
+                    fill: "FFECEF",
+                    alignment: { horizontal: "center" },
+                    border: { ...thinBorder, bottom: { style: "thin", color: { rgb: "FFC0C0" } } }
+                }),
+                // 卡片数值 — 橙色（完成率）
+                cardValueOrange: S({
+                    font: { bold: true, sz: 14, color: { rgb: "FF9F0A" } },
+                    fill: "FFF5E6",
+                    alignment: { horizontal: "center" },
+                    border: { ...thinBorder, bottom: { style: "thin", color: { rgb: "FFD9A0" } } }
+                }),
 
-                    // --- 标题行样式 ---
-                    if (R === 0 || R === 4 || R === detailStartRowIndex - 1) {
-                        if (C === 0) ws[cellRef].s = titleStyle;
-                        continue;
-                    }
+                // 分类汇总标题
+                catTitle: S({ font: { bold: true, sz: 13, color: { rgb: "1D1D1F" } }, alignment: { horizontal: "left" } }),
 
-                    // --- 汇总表头样式 ---
-                    if (R === 1 || R === 5) {
-                        if (C < aoa[R].length) ws[cellRef].s = summaryHeaderStyle;
-                        continue;
-                    }
+                // 分类汇总表头
+                catHeader: S({
+                    font: { bold: true, sz: 10, color: { rgb: "FFFFFF" } },
+                    fill: "3A3A3C",
+                    alignment: { horizontal: "center" },
+                    border: { top: { style: "thin", color: { rgb: "2C2C2E" } }, bottom: { style: "thin", color: { rgb: "2C2C2E" } } }
+                }),
 
-                    // --- 汇总数据行样式 ---
-                    if (R > 1 && R < 4) { // 总计数据
-                        if (C < aoa[R].length) {
-                            let cellStyle = JSON.parse(JSON.stringify(baseStyle));
-                            cellStyle.font.bold = true;
-                            if (C === 2) { // 预算差额
-                                const val = String(ws[cellRef].v);
-                                if (val.startsWith('+')) cellStyle.font.color = { rgb: "30D158" };
-                                else if (val.startsWith('-')) cellStyle.font.color = { rgb: "FF3B30" };
-                            }
-                            ws[cellRef].s = cellStyle;
-                        }
-                        continue;
-                    }
+                // 分类数据行（交替底色）
+                catData: S({ alignment: { horizontal: "center" }, border: bottomThin }),
+                catDataAlt: S({ alignment: { horizontal: "center" }, fill: "F5F5F7", border: bottomThin }),
+                catDataName: S({ font: { bold: true }, alignment: { horizontal: "left" }, border: bottomThin }),
+                catDataNameAlt: S({ font: { bold: true }, alignment: { horizontal: "left" }, fill: "F5F5F7", border: bottomThin }),
+                catDataProgress: S({ font: { sz: 10, color: { rgb: "0A84FF" }, bold: true }, alignment: { horizontal: "left" }, border: bottomThin }),
+                catDataProgressAlt: S({ font: { sz: 10, color: { rgb: "0A84FF" }, bold: true }, alignment: { horizontal: "left" }, fill: "F5F5F7", border: bottomThin }),
+                catDataBudget: S({ font: { color: { rgb: "0A84FF" }, bold: true }, alignment: { horizontal: "right" }, border: bottomThin }),
+                catDataBudgetAlt: S({ font: { color: { rgb: "0A84FF" }, bold: true }, alignment: { horizontal: "right" }, fill: "F5F5F7", border: bottomThin }),
+                catDataActual: S({ font: { color: { rgb: "FF9F0A" }, bold: true }, alignment: { horizontal: "right" }, border: bottomThin }),
+                catDataActualAlt: S({ font: { color: { rgb: "FF9F0A" }, bold: true }, alignment: { horizontal: "right" }, fill: "F5F5F7", border: bottomThin }),
 
-                    if (R > 5 && R < detailStartRowIndex - 2) { // 分类数据
-                        if (C < aoa[R].length) {
-                            let cellStyle = JSON.parse(JSON.stringify(baseStyle));
-                            ws[cellRef].s = cellStyle;
-                        }
-                        continue;
-                    }
+                // 明细标题
+                detailTitle: S({ font: { bold: true, sz: 13, color: { rgb: "1D1D1F" } }, alignment: { horizontal: "left" } }),
 
-                    // --- 明细清单表头 ---
-                    if (R === detailStartRowIndex) {
-                        ws[cellRef].s = headerStyle;
-                        continue;
-                    }
+                // 明细表头
+                detailHeader: S({
+                    font: { bold: true, sz: 11, color: { rgb: "FFFFFF" } },
+                    fill: "0A84FF",
+                    alignment: { horizontal: "center" },
+                    border: thinBorder
+                }),
 
-                    // --- 明细数据行样式 ---
-                    if (R > detailStartRowIndex) {
-                        let cellStyle = JSON.parse(JSON.stringify(baseStyle));
-                        
-                        const rowDataIndex = R - detailStartRowIndex - 1;
-                        const rowData = dataToExport[rowDataIndex];
-                        if(!rowData) continue; // 安全检查
-                        
-                        const bPrice = Number(rowData.budgetPrice) || 0;
-                        const aPrice = Number(rowData.actualPrice) || 0;
-                        const isOverBudget = bPrice > 0 && aPrice > bPrice;
+                // 明细数据行 — 基础
+                dataCell: S({ alignment: { horizontal: "center" }, border: thinBorder }),
+                dataCellAlt: S({ alignment: { horizontal: "center" }, fill: "FAFAFA", border: thinBorder }),
+                dataName: S({ font: { bold: true, sz: 11 }, alignment: { horizontal: "left" }, border: thinBorder }),
+                dataNameAlt: S({ font: { bold: true, sz: 11 }, alignment: { horizontal: "left" }, fill: "FAFAFA", border: thinBorder }),
+                dataSubtle: S({ font: { color: { rgb: "86868B" } }, alignment: { horizontal: "center" }, border: thinBorder }),
+                dataSubtleAlt: S({ font: { color: { rgb: "86868B" } }, alignment: { horizontal: "center" }, fill: "FAFAFA", border: thinBorder }),
 
-                        // 金额列处理
-                        if (C === 5 || C === 6 || C === 7) {
-                            ws[cellRef].t = 'n'; 
-                            cellStyle.font.bold = (C === 6 || C === 7); 
-                            cellStyle.alignment.horizontal = "right"; 
-                            
-                            if (C === 6 && isOverBudget) cellStyle.font.color = { rgb: "FF3B30" };
-                            
-                            if (C === 7) {
-                                if (rowData.status === '待购') {
-                                    ws[cellRef].t = 's';
-                                    cellStyle.font.color = { rgb: "8E8E93" };
-                                    cellStyle.alignment.horizontal = "center";
-                                } else {
-                                    const diff = bPrice - aPrice;
-                                    if (diff < 0) cellStyle.font.color = { rgb: "FF3B30" };
-                                    else if (diff > 0) cellStyle.font.color = { rgb: "30D158" };
-                                }
-                            }
-                        }
+                // 金额列
+                amount: S({ alignment: { horizontal: "right" }, border: thinBorder, numFmt: '#,##0' }),
+                amountAlt: S({ alignment: { horizontal: "right" }, fill: "FAFAFA", border: thinBorder, numFmt: '#,##0' }),
+                amountBold: S({ font: { bold: true }, alignment: { horizontal: "right" }, border: thinBorder, numFmt: '#,##0' }),
+                amountBoldAlt: S({ font: { bold: true }, alignment: { horizontal: "right" }, fill: "FAFAFA", border: thinBorder, numFmt: '#,##0' }),
 
-                        // 状态列
-                        if (C === 9) {
-                            const status = ws[cellRef].v;
-                            cellStyle.font.bold = true;
-                            if (status === '完成') {
-                                cellStyle.font.color = { rgb: "248A3D" };
-                                cellStyle.fill = { fgColor: { rgb: "EBF9F0" } };
-                            } else if (status === '付款') {
-                                cellStyle.font.color = { rgb: "B26800" };
-                                cellStyle.fill = { fgColor: { rgb: "FFF6E5" } };
-                            } else {
-                                cellStyle.font.color = { rgb: "0056B3" };
-                                cellStyle.fill = { fgColor: { rgb: "E5F1FF" } };
-                            }
-                        }
-                        
-                        // 优先度
-                        if (C === 1) {
-                            const priority = ws[cellRef].v;
-                            cellStyle.font.bold = true;
-                            if (priority === '高') cellStyle.font.color = { rgb: "FF3B30" };
-                            else if (priority === '中') cellStyle.font.color = { rgb: "FF9F0A" };
-                            else cellStyle.font.color = { rgb: "8E8E93" };
-                        }
+                // 差额颜色
+                diffGreen: S({ font: { bold: true, color: { rgb: "30D158" } }, alignment: { horizontal: "right" }, border: thinBorder, numFmt: '#,##0' }),
+                diffGreenAlt: S({ font: { bold: true, color: { rgb: "30D158" } }, alignment: { horizontal: "right" }, fill: "FAFAFA", border: thinBorder, numFmt: '#,##0' }),
+                diffRed: S({ font: { bold: true, color: { rgb: "FF453A" } }, alignment: { horizontal: "right" }, border: thinBorder, numFmt: '#,##0' }),
+                diffRedAlt: S({ font: { bold: true, color: { rgb: "FF453A" } }, alignment: { horizontal: "right" }, fill: "FAFAFA", border: thinBorder, numFmt: '#,##0' }),
+                diffPending: S({ font: { color: { rgb: "86868B" } }, alignment: { horizontal: "center" }, border: thinBorder }),
+                diffPendingAlt: S({ font: { color: { rgb: "86868B" } }, alignment: { horizontal: "center" }, fill: "FAFAFA", border: thinBorder }),
 
-                        if (isOverBudget && C !== 9) cellStyle.fill = { fgColor: { rgb: "FFF2F2" } };
+                // 超预算实际金额
+                actualOver: S({ font: { bold: true, color: { rgb: "FF453A" } }, alignment: { horizontal: "right" }, border: thinBorder, numFmt: '#,##0' }),
+                actualOverAlt: S({ font: { bold: true, color: { rgb: "FF453A" } }, alignment: { horizontal: "right" }, fill: "FFF5F5", border: thinBorder, numFmt: '#,##0' }),
 
-                        if (C === 3 || C === 8 || C === 10) {
-                            if (!isOverBudget) cellStyle.font.color = { rgb: "86868B" };
-                        }
+                // 超预算行底色
+                overBudget: S({ alignment: { horizontal: "center" }, fill: "FFF5F5", border: thinBorder }),
+                overBudgetName: S({ font: { bold: true, sz: 11 }, alignment: { horizontal: "left" }, fill: "FFF5F5", border: thinBorder }),
+                overBudgetSubtle: S({ font: { color: { rgb: "86868B" } }, alignment: { horizontal: "center" }, fill: "FFF5F5", border: thinBorder }),
+                overBudgetAmount: S({ alignment: { horizontal: "right" }, fill: "FFF5F5", border: thinBorder, numFmt: '#,##0' }),
 
-                        if (C === 10) cellStyle.alignment.wrapText = true;
+                // 状态色块（更鲜艳）
+                statusDone: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "30D158", alignment: { horizontal: "center" }, border: thinBorder }),
+                statusPaid: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "FF9F0A", alignment: { horizontal: "center" }, border: thinBorder }),
+                statusPending: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "0A84FF", alignment: { horizontal: "center" }, border: thinBorder }),
+                statusDoneAlt: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "30D158", alignment: { horizontal: "center" }, border: thinBorder }),
+                statusPaidAlt: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "FF9F0A", alignment: { horizontal: "center" }, border: thinBorder }),
+                statusPendingAlt: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "0A84FF", alignment: { horizontal: "center" }, border: thinBorder }),
 
-                        ws[cellRef].s = cellStyle;
-                    }
-                }
+                // 优先度（色块背景）
+                prioHigh: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "FF453A", alignment: { horizontal: "center" }, border: thinBorder }),
+                prioMid: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "FF9F0A", alignment: { horizontal: "center" }, border: thinBorder }),
+                prioLow: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "8E8E93", alignment: { horizontal: "center" }, border: thinBorder }),
+                prioHighAlt: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "FF453A", alignment: { horizontal: "center" }, border: thinBorder }),
+                prioMidAlt: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "FF9F0A", alignment: { horizontal: "center" }, border: thinBorder }),
+                prioLowAlt: S({ font: { bold: true, color: { rgb: "FFFFFF" } }, fill: "8E8E93", alignment: { horizontal: "center" }, border: thinBorder }),
+
+                // 分类分组标题（明细区内）
+                groupHeader: S({
+                    font: { bold: true, sz: 11, color: { rgb: "1D1D1F" } },
+                    fill: "ECECEC",
+                    alignment: { horizontal: "left" },
+                    border: { top: { style: "thin", color: { rgb: "D1D1D6" } }, bottom: { style: "thin", color: { rgb: "D1D1D6" } } }
+                }),
+
+                // 备注
+                notes: S({ font: { color: { rgb: "86868B" } }, alignment: { horizontal: "left", wrapText: true }, border: thinBorder }),
+                notesAlt: S({ font: { color: { rgb: "86868B" } }, alignment: { horizontal: "left", wrapText: true }, fill: "FAFAFA", border: thinBorder }),
+                notesOver: S({ font: { color: { rgb: "86868B" } }, alignment: { horizontal: "left", wrapText: true }, fill: "FFF5F5", border: thinBorder }),
+
+                // 空单元格
+                empty: S({})
+            };
+
+            // ========== 5. 合并单元格 ==========
+            ws['!merges'] = [
+                // 标题行：跨 11 列
+                { s: { r: rowMap.title, c: 0 }, e: { r: rowMap.title, c: 10 } },
+                // 卡片区域：4 张卡片，每张 2 行
+                // 卡片1: 总预算 (col 0-2)
+                { s: { r: rowMap.cardLabel, c: 0 }, e: { r: rowMap.cardLabel, c: 2 } },
+                { s: { r: rowMap.cardValue, c: 0 }, e: { r: rowMap.cardValue, c: 2 } },
+                // 卡片2: 实际支出 (col 3-5)
+                { s: { r: rowMap.cardLabel, c: 3 }, e: { r: rowMap.cardLabel, c: 5 } },
+                { s: { r: rowMap.cardValue, c: 3 }, e: { r: rowMap.cardValue, c: 5 } },
+                // 卡片3: 预算差额 (col 6-8)
+                { s: { r: rowMap.cardLabel, c: 6 }, e: { r: rowMap.cardLabel, c: 8 } },
+                { s: { r: rowMap.cardValue, c: 6 }, e: { r: rowMap.cardValue, c: 8 } },
+                // 卡片4: 完成率 (col 9-10)
+                { s: { r: rowMap.cardLabel, c: 9 }, e: { r: rowMap.cardLabel, c: 10 } },
+                { s: { r: rowMap.cardValue, c: 9 }, e: { r: rowMap.cardValue, c: 10 } },
+                // 分类标题：跨 5 列
+                { s: { r: rowMap.catTitle, c: 0 }, e: { r: rowMap.catTitle, c: 4 } },
+                // 明细标题：跨 11 列
+                { s: { r: rowMap.detailTitle, c: 0 }, e: { r: rowMap.detailTitle, c: 10 } }
+            ];
+
+            // ========== 6. 行高配置 ==========
+            ws['!rows'] = [];
+            const setRowH = (r, h) => { ws['!rows'][r] = { hpx: h }; };
+
+            setRowH(rowMap.title, 40);         // 标题行
+            setRowH(rowMap.cardLabel, 22);       // 卡片标签
+            setRowH(rowMap.cardValue, 38);       // 卡片数值（大字号）
+            setRowH(rowMap.catTitle, 32);        // 分类标题
+            setRowH(rowMap.catHeader, 28);       // 分类表头
+            setRowH(rowMap.detailTitle, 32);     // 明细标题
+            setRowH(rowMap.detailHeader, 32);    // 明细表头
+
+            // 分类数据行 + 明细数据行（含分组标题）
+            for (let R = rowMap.catDataStart; R < rowMap.catDataStart + catKeys.length; R++) {
+                setRowH(R, 30);
+            }
+            detailRowMap.forEach(entry => {
+                if (entry.type === 'groupHeader') setRowH(entry.row, 32);
+                else setRowH(entry.row, 36);
+            });
+
+            // ========== 7. 应用样式 ==========
+            const setCell = (r, c, style) => {
+                const ref = XLSX.utils.encode_cell({ c, r });
+                if (!ws[ref]) ws[ref] = { t: 's', v: '' };
+                ws[ref].s = style;
+            };
+
+            // --- 标题行 ---
+            setCell(rowMap.title, 0, styles.title);
+
+            // --- 卡片标签行（每张卡片独立色调） ---
+            // 卡片1=蓝(总预算), 卡片2=橙(实际支出), 卡片3=绿/红(差额), 卡片4=橙(完成率)
+            const cardLabelMap = [styles.cardLabelBlue, styles.cardLabelOrange, diffPrice >= 0 ? styles.cardLabelGreen : styles.cardLabelRed, styles.cardLabelOrange];
+            for (let c = 0; c <= 10; c++) {
+                const cardIdx = c <= 2 ? 0 : c <= 5 ? 1 : c <= 8 ? 2 : 3;
+                setCell(rowMap.cardLabel, c, cardLabelMap[cardIdx]);
             }
 
-            // 6. 设置列宽 (针对明细表的 11 列)
+            // --- 卡片数值行 ---
+            const cardValueStyles = [styles.cardValue, styles.cardValueBlue, diffPrice >= 0 ? styles.cardValueGreen : styles.cardValueRed, styles.cardValueOrange];
+            for (let c = 0; c <= 10; c++) {
+                const cardIdx = c <= 2 ? 0 : c <= 5 ? 1 : c <= 8 ? 2 : 3;
+                setCell(rowMap.cardValue, c, cardValueStyles[cardIdx]);
+            }
+
+            // --- 分类汇总标题 ---
+            setCell(rowMap.catTitle, 0, styles.catTitle);
+
+            // --- 分类汇总表头 ---
+            for (let c = 0; c <= 4; c++) {
+                setCell(rowMap.catHeader, c, styles.catHeader);
+            }
+
+            // --- 分类数据行（交替底色 + 彩色金额） ---
+            for (let i = 0; i < catKeys.length; i++) {
+                const R = rowMap.catDataStart + i;
+                const isAlt = i % 2 === 1;
+                setCell(R, 0, isAlt ? styles.catDataNameAlt : styles.catDataName);      // 分类名
+                setCell(R, 1, isAlt ? styles.catDataBudgetAlt : styles.catDataBudget);    // 总预算（蓝）
+                setCell(R, 2, isAlt ? styles.catDataActualAlt : styles.catDataActual);    // 实际支出（橙）
+                setCell(R, 3, isAlt ? styles.catDataProgressAlt : styles.catDataProgress); // 进度条（蓝）
+                setCell(R, 4, isAlt ? styles.catDataAlt : styles.catData);                // 项目数
+            }
+
+            // --- 明细清单标题 ---
+            setCell(rowMap.detailTitle, 0, styles.detailTitle);
+
+            // --- 明细表头 ---
+            for (let c = 0; c <= 10; c++) {
+                setCell(rowMap.detailHeader, c, styles.detailHeader);
+            }
+
+            // --- 明细数据行（按分类分组） ---
+            let globalDataIdx = 0; // 全局数据行序号（用于交替行底色）
+            let groupColorIdx = 0;  // 分类组颜色索引
+            detailRowMap.forEach(entry => {
+                const R = entry.row;
+
+                // 分类分组标题行（彩色）
+                if (entry.type === 'groupHeader') {
+                    const cp = catPalette[groupColorIdx % catPalette.length];
+                    const grpStyle = S({
+                        font: { bold: true, sz: 11, color: { rgb: cp.accent } },
+                        fill: cp.bg,
+                        alignment: { horizontal: "left" },
+                        border: { top: { style: "thin", color: { rgb: cp.accent } }, bottom: { style: "thin", color: { rgb: cp.accent } } }
+                    });
+                    setCell(R, 0, grpStyle);
+                    ws['!merges'].push({ s: { r: R, c: 0 }, e: { r: R, c: 10 } });
+                    groupColorIdx++;
+                    return;
+                }
+
+                // 数据行
+                const item = entry.item;
+                const i = globalDataIdx++;
+                const bPrice = Number(item.budgetPrice) || 0;
+                const aPrice = Number(item.actualPrice) || 0;
+                const isAlt = i % 2 === 1;       // 交替行
+                const isOver = bPrice > 0 && aPrice > bPrice; // 超预算
+
+                // Col 0: 名称
+                setCell(R, 0, isOver ? styles.overBudgetName : (isAlt ? styles.dataNameAlt : styles.dataName));
+
+                // Col 1: 优先度
+                const prio = item.priority;
+                if (prio === '高') setCell(R, 1, isAlt ? styles.prioHighAlt : styles.prioHigh);
+                else if (prio === '中') setCell(R, 1, isAlt ? styles.prioMidAlt : styles.prioMid);
+                else setCell(R, 1, isAlt ? styles.prioLowAlt : styles.prioLow);
+
+                // Col 2: 分类
+                setCell(R, 2, isOver ? styles.overBudget : (isAlt ? styles.dataSubtleAlt : styles.dataSubtle));
+
+                // Col 3: 品牌
+                setCell(R, 3, isOver ? styles.overBudgetSubtle : (isAlt ? styles.dataSubtleAlt : styles.dataSubtle));
+
+                // Col 4: 数量
+                setCell(R, 4, isOver ? styles.overBudget : (isAlt ? styles.dataCellAlt : styles.dataCell));
+
+                // Col 5: 预算金额
+                setCell(R, 5, isOver ? styles.overBudgetAmount : (isAlt ? styles.amountAlt : styles.amount));
+
+                // Col 6: 实际金额
+                if (isOver) setCell(R, 6, isAlt ? styles.actualOverAlt : styles.actualOver);
+                else setCell(R, 6, isAlt ? styles.amountBoldAlt : styles.amountBold);
+
+                // Col 7: 差额
+                if (item.status === '待购') {
+                    setCell(R, 7, isAlt ? styles.diffPendingAlt : styles.diffPending);
+                } else {
+                    const diff = bPrice - aPrice;
+                    if (diff < 0) setCell(R, 7, isAlt ? styles.diffRedAlt : styles.diffRed);
+                    else setCell(R, 7, isAlt ? styles.diffGreenAlt : styles.diffGreen);
+                }
+
+                // Col 8: 购买渠道
+                setCell(R, 8, isOver ? styles.overBudgetSubtle : (isAlt ? styles.dataSubtleAlt : styles.dataSubtle));
+
+                // Col 9: 状态
+                const status = item.status;
+                if (status === '完成') setCell(R, 9, isAlt ? styles.statusDoneAlt : styles.statusDone);
+                else if (status === '付款') setCell(R, 9, isAlt ? styles.statusPaidAlt : styles.statusPaid);
+                else setCell(R, 9, isAlt ? styles.statusPendingAlt : styles.statusPending);
+
+                // Col 10: 备注
+                setCell(R, 10, isOver ? styles.notesOver : (isAlt ? styles.notesAlt : styles.notes));
+            });
+
+            // ========== 8. 列宽配置 ==========
             ws['!cols'] = [
-                { wpx: 150 }, // 名称
+                { wpx: 160 }, // 名称
                 { wpx: 60 },  // 优先度
                 { wpx: 80 },  // 分类
                 { wpx: 120 }, // 品牌
                 { wpx: 50 },  // 数量
-                { wpx: 100 }, // 预算
-                { wpx: 100 }, // 实际
+                { wpx: 110 }, // 预算金额
+                { wpx: 110 }, // 实际金额
                 { wpx: 100 }, // 差额
-                { wpx: 120 }, // 渠道
+                { wpx: 120 }, // 购买渠道
                 { wpx: 80 },  // 状态
-                { wpx: 250 }  // 备注
+                { wpx: 260 }  // 备注
             ];
 
-            // 7. 导出文件
+            // ========== 9. 冻结窗格（明细表头固定） ==========
+            ws['!freeze'] = {
+                xSplit: 0,
+                ySplit: rowMap.detailHeader + 1,
+                topLeft: XLSX.utils.encode_cell({ c: 0, r: rowMap.detailHeader + 1 }),
+                state: 'frozen'
+            };
+
+            // ========== 10. 导出文件 ==========
             XLSX.utils.book_append_sheet(wb, ws, "预算清单");
-            
-            const d = new Date();
-            const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             XLSX.writeFile(wb, `装修预算_${dateStr}.xlsx`);
         }
 

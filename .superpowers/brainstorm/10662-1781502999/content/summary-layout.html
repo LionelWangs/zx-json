@@ -1,0 +1,111 @@
+<h2>汇总区域布局方案</h2>
+<p class="subtitle">总计汇总 + 分类汇总，哪种方式更直观？</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>横向卡片式</h3>
+      <p>总预算 / 实际支出 / 差额 / 完成率 四个指标横排展示，每个指标独立单元格，大号数字 + 小标签。下方紧跟分类汇总表。</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-body" style="padding:16px;background:#0a0a0a;color:#f5f5f7;font-family:-apple-system,sans-serif">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+            <div style="background:rgba(28,28,30,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;text-align:center">
+              <div style="font-size:11px;color:#86868b;margin-bottom:6px">总预算</div>
+              <div style="font-size:22px;font-weight:600;color:#f5f5f7">¥86,400</div>
+            </div>
+            <div style="background:rgba(28,28,30,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;text-align:center">
+              <div style="font-size:11px;color:#86868b;margin-bottom:6px">实际支出</div>
+              <div style="font-size:22px;font-weight:600;color:#0a84ff">¥52,300</div>
+            </div>
+            <div style="background:rgba(28,28,30,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;text-align:center">
+              <div style="font-size:11px;color:#86868b;margin-bottom:6px">预算差额</div>
+              <div style="font-size:22px;font-weight:600;color:#30d158">+¥34,100</div>
+            </div>
+            <div style="background:rgba(28,28,30,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;text-align:center">
+              <div style="font-size:11px;color:#86868b;margin-bottom:6px">完成率</div>
+              <div style="font-size:22px;font-weight:600;color:#ff9f0a">60%</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:#86868b;text-align:center">↑ Excel 中每个卡片 = 一个合并单元格区域</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>纵向指标板</h3>
+      <p>左侧放汇总指标（纵向排列），右侧放分类汇总表格。信息密度更高，适合数据量大的场景。</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-body" style="padding:16px;background:#0a0a0a;color:#f5f5f7;font-family:-apple-system,sans-serif">
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:16px">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="background:rgba(28,28,30,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px">
+                <div style="font-size:10px;color:#86868b">总预算</div>
+                <div style="font-size:18px;font-weight:600">¥86,400</div>
+              </div>
+              <div style="background:rgba(28,28,30,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px">
+                <div style="font-size:10px;color:#86868b">实际支出</div>
+                <div style="font-size:18px;font-weight:600;color:#0a84ff">¥52,300</div>
+              </div>
+              <div style="background:rgba(28,28,30,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px">
+                <div style="font-size:10px;color:#86868b">差额</div>
+                <div style="font-size:18px;font-weight:600;color:#30d158">+¥34,100</div>
+              </div>
+              <div style="background:rgba(28,28,30,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px">
+                <div style="font-size:10px;color:#86868b">完成率</div>
+                <div style="font-size:18px;font-weight:600;color:#ff9f0a">60%</div>
+              </div>
+            </div>
+            <div style="background:rgba(28,28,30,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px;font-size:12px">
+              <div style="color:#86868b;margin-bottom:8px;font-weight:600">分类汇总</div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><span>家电</span><span>¥32,000</span></div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><span>硬装</span><span>¥28,500</span></div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0"><span>软装</span><span>¥25,900</span></div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:#86868b;text-align:center;margin-top:8px">↑ Excel 中左右并排 = 列区域划分</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>紧凑表格式</h3>
+      <p>保持现有表格结构但大幅优化样式：更精致的表头、条件色条、货币格式化、交替行底色。改动最小，效果提升明显。</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-body" style="padding:16px;background:#0a0a0a;color:#f5f5f7;font-family:-apple-system,sans-serif">
+          <div style="font-size:13px;font-weight:600;color:#f5f5f7;margin-bottom:10px;padding-left:4px">总计汇总</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="background:rgba(255,255,255,0.06)">
+                <th style="padding:10px 12px;text-align:left;color:#86868b;font-weight:500;border-bottom:1px solid rgba(255,255,255,0.08)">总预算</th>
+                <th style="padding:10px 12px;text-align:right;color:#86868b;font-weight:500;border-bottom:1px solid rgba(255,255,255,0.08)">实际支出</th>
+                <th style="padding:10px 12px;text-align:right;color:#86868b;font-weight:500;border-bottom:1px solid rgba(255,255,255,0.08)">差额</th>
+                <th style="padding:10px 12px;text-align:center;color:#86868b;font-weight:500;border-bottom:1px solid rgba(255,255,255,0.08)">完成率</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:12px;font-weight:600;font-size:14px">¥86,400</td>
+                <td style="padding:12px;text-align:right;font-weight:600;font-size:14px;color:#0a84ff">¥52,300</td>
+                <td style="padding:12px;text-align:right;font-weight:600;font-size:14px;color:#30d158">+¥34,100</td>
+                <td style="padding:12px;text-align:center">
+                  <div style="display:flex;align-items:center;gap:8px;justify-content:center">
+                    <div style="flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;max-width:80px"><div style="width:60%;height:100%;background:#ff9f0a;border-radius:3px"></div></div>
+                    <span style="font-weight:600;color:#ff9f0a">60%</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="font-size:10px;color:#86868b;text-align:center;margin-top:8px">↑ 带进度条的紧凑表格</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
