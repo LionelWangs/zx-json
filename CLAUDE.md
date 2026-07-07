@@ -52,7 +52,7 @@
 - 差分同步：拉取时展示 **新增 / 修改 / 删除** 细粒度对比
 
 ### 数据导出
-- **Excel 导出**（`xlsx-js-style`）：含总计汇总 + 分类汇总 + 明细清单三层结构，支持条件着色样式
+- **Excel 导出**（`xlsx-js-style`）：Apple 风格设计，含标题行、横向卡片式汇总区（4色卡片）、分类汇总表（交替行+彩色金额+进度条）、按分类分组的明细清单（色块状态标签、色块优先度、超预算警示行）、冻结窗格，金额自动千分位格式化
 - **JSON 导出/导入**：完整数据备份与恢复
 
 ---
@@ -98,18 +98,20 @@
 
 ```
 zx/
-├── index.html              ← 主应用（全部 UI + 逻辑 + 样式）
+├── index.html              ← 主应用（全部 UI + 逻辑 + 样式，约 4500 行）
 ├── CLAUDE.md               ← 项目说明书（就是本文件 🎯）
 ├── 装修预算.json            ← 云端同步的 JSON 数据文件
-├── replace.js              ← GitHub → Gitee 文本替换脚本
-├── update_gitee.js          ← Gitee 推送/同步逻辑升级脚本
-├── update_dual.js           ← 双平台（Gitee + GitHub）支持脚本
-├── update_excel.js          ← Excel 导出升级脚本（三层样式）
-├── history/                 ← 云端历史版本备份目录
-│   └── *.json               ← 按时间戳命名的历史快照
+├── replace.js              ← GitHub → Gitee 文本替换脚本（历史）
+├── update_gitee.js         ← Gitee 推送/同步逻辑升级脚本（历史）
+├── update_dual.js          ← 双平台支持脚本（历史）
+├── update_excel.js         ← Excel 导出样式升级脚本（历史）
+├── history/                ← 云端历史版本备份目录
+│   └── *.json              ← 按时间戳命名的历史快照
 └── .vscode/
-    └── settings.json        ← VS Code 配置（Live Server 端口 5501）
+    └── settings.json       ← VS Code 配置（Live Server 端口 5501）
 ```
+
+> 注意：`update_*.js` 系列脚本为历史升级脚本，当前所有逻辑已内联到 `index.html` 中。
 
 ---
 
@@ -161,10 +163,10 @@ zx/
 # 快捷键: Ctrl+Shift+P → "Open with Live Server"
 # 端口: 5501（已配置）
 
-# 或 Python 简易 HTTP 服务
-python3 -m http.server 8000
+# Python 简易 HTTP 服务
+python3 -m http.server 5501
 
-# 或 Node.js serve
+# Node.js serve
 npx serve .
 ```
 
@@ -231,7 +233,8 @@ let syncConfig = {
 | `replace.js` | GitHub → Gitee 文本替换 | `node replace.js` |
 | `update_gitee.js` | 升级 Gitee 推送/同步逻辑 | `node update_gitee.js` |
 | `update_dual.js` | 添加双平台支持 | `node update_dual.js` |
-| `update_excel.js` | 升级 Excel 导出样式 | `node update_excel.js` |
+
+> `update_*.js` 系列为历史升级脚本，当前逻辑已内联至 `index.html`。
 
 ---
 
@@ -241,6 +244,14 @@ let syncConfig = {
 - 原生 JavaScript（ES6+），无框架依赖
 - 全局函数 + 闭包变量管理模式
 - CSS 变量驱动主题，`-webkit-` 前缀兼容 Safari
+
+### Excel 导出（exportExcel）
+`index.html` 内嵌的 `exportExcel()` 函数（约 380 行），使用 `xlsx-js-style` 库生成样式化 Excel：
+- **样式工厂**：通过 `S()` 工厂函数生成预定义样式对象，避免深拷贝性能开销
+- **行索引映射**：`rowMap` / `detailRowMap` 对象记录各区域的起始行索引，用于样式批量应用
+- **合并单元格**：`ws['!merges']` 数组存储所有跨列/跨行合并
+- **冻结窗格**：`ws['!freeze']` 配置明细表头行冻结
+- 修改后运行 `node -e "new Function(code)"` 语法检查
 
 ### 设计原则
 - **移动优先响应式**：`clamp()` + 弹性布局

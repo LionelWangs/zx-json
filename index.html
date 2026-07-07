@@ -1901,6 +1901,7 @@
                     <button class="filter-btn active" data-category="all" onclick="setCategoryFilter('all')">全部分类</button>
                     <button class="filter-btn" data-category="硬装" onclick="setCategoryFilter('硬装')">硬装</button>
                     <button class="filter-btn" data-category="家电" onclick="setCategoryFilter('家电')">家电</button>
+                    <button class="filter-btn" data-category="软装" onclick="setCategoryFilter('软装')">软装</button>
                     <button class="filter-btn" data-category="必要支出" onclick="setCategoryFilter('必要支出')">必要支出</button>
                 </div>
                 <div class="filter-group" id="statusFilter">
@@ -2027,6 +2028,7 @@
                     <select class="form-control" id="form-category">
                         <option value="硬装">硬装</option>
                         <option value="家电">家电</option>
+                        <option value="软装">软装</option>
                         <option value="必要支出">必要支出</option>
                     </select>
                 </div>
@@ -2161,7 +2163,7 @@
         let appliances = [];
         let filteredData = []; // 用于搜索筛选和排序后的数据
         let currentFilter = 'all'; // all, 待购, 付款, 完成
-        let currentCategoryFilter = 'all'; // all, 硬装, 家电, 必要支出
+        let currentCategoryFilter = 'all'; // all, 硬装, 家电, 软装, 必要支出
         let currentSearch = '';
         let sortConfig = { key: null, isDesc: false }; // 恢复为默认手动排序，以便使用拖拽功能
         let hiddenColumns = new Set(); // 存储被隐藏的列 data-col 名字
